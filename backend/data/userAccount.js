@@ -1,0 +1,17 @@
+//defien the user account list
+let userAccount=[
+    { id:"00000001", name:"Student", firstname: "Tom", lastname: "Jim", password:"123456", Loginrole:"Student",email:"Student@google.com",Grade:[65,78,44,33]},
+    { id:'00000002', name: 'Teacher', firstname: "Evelyn", lastname: "Mia",password: '123456', Loginrole: 'Teacher',email:"Teacher@google.com",Grade:[34,45,23,22]},
+    { id:'00000003',name: 'Administrator', firstname: "Li", lastname: "Lei",password: '123456', Loginrole: 'Administrator',email:"Administrator@google.com",Grade:[]},
+    { id:"00000004", name:"Student2", firstname: "Lily", lastname: "Sophia", password:"123456", Loginrole:"Student",email:"Student2@google.com",Grade:[33,24,54,23]},
+    { id:'00000005', name: 'Studen3', firstname: "Lucy", lastname: "Camila",password: '123456', Loginrole: 'Student',email:"Student3@google.com",Grade:[44,23,54,34,23,42,23]},
+    { id:'00000006',name: 'Student4', firstname: "Gim", lastname: "Elizabeth",password: '123456', Loginrole: 'Student',email:"Student4@google.com",Grade:[43,23,45,64]},
+    { id:"00000007", name:"Student5", firstname: "Greny", lastname: "Avery", password:"123456", Loginrole:"Student",email:"Student5@google.com",Grade:[32,34,54,54]},
+    { id:'00000008', name: 'Student6', firstname: "Jajy", lastname: "Aria",password: '123456', Loginrole: 'Student',email:"Student6@google.com",Grade:[54,34,23,24,75,43]},
+    { id:'00000009',name: 'Student7', firstname: "Tomy", lastname: "Madison",password: '123456', Loginrole: 'Student',email:"Student7@google.com",Grade:[23,43,54,32,12,45]},
+    { id:"00000010", name:"Student8", firstname: "Gigy", lastname: "Grace", password:"123456", Loginrole:"Student",email:"Student8@google.com",Grade:[34,53,23,75,23]},
+    { id:'00000011', name: 'Student9', firstname: "Liam", lastname: "ToWillowm",password: '123456', Loginrole: 'Student',email:"Student9@google.com",Grade:[12,43,56,78,65]},
+    { id:'00000012',name: 'Student10', firstname: "William", lastname: "Lillian",password: '123456', Loginrole: 'Student',email:"Student10@google.com",Grade:[32,56,34,65,43,23,76,45]},
+  ]
+
+module.exports = userAccount;
