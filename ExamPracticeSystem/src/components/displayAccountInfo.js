@@ -180,12 +180,15 @@ function DisplayAccountInfo() {
             style={{ marginTop: '20px' }}
             fullWidth
           />
-        </DialogContent>
-        {error && (
-          <Alert variant="outlined" severity="error">
-            {error}
-          </Alert>
+          {error && (
+          <div>
+            <br />
+              <Alert variant="outlined" severity="error">
+               {error}
+            </Alert>
+          </div>
         )}
+        </DialogContent>
         <DialogActions>
         <Button onClick={() => { setUpdatePassword(false);setUpdatePasswordInfo({})}}>Cancel</Button>
 

@@ -16,6 +16,7 @@ import TimerIcon from '@mui/icons-material/Timer';
 import { AppContext } from './AppContext';
 import DisplayAccountInfo from './displayAccountInfo';
 import AccountMangement from './accountMangement'
+import ManagePracticeBank from './PracticeBank/managePracticeBank'
 
 
 const iconColor = 'rgba(255, 255, 255, 0.7)';
@@ -31,7 +32,7 @@ const categories = [
   {
     id: 'Teacher',
     children: [
-      { id: 'Quiz Management', icon: <SettingsIcon sx={{ color: iconColor }} /> },
+      { id: 'Pratice Bank Management', icon: <SettingsIcon sx={{ color: iconColor }} />, activeModule:<ManagePracticeBank/> },
       { id: 'View Grade', icon: <TimerIcon sx={{ color: iconColor }} /> },
     ],
   },
