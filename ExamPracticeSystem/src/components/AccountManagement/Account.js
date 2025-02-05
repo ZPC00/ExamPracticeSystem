@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import Stack from '@mui/material/Stack';
-import Avatar from '@mui/material/Avatar';
-import { AppContext } from './AppContext';
-import Alert from '@mui/material/Alert';
-import Tooltip from '@mui/material/Tooltip';
+import { 
+  Toolbar, Button, Typography, Modal, Box, TextField, 
+  Autocomplete, Stack, Alert, Avatar, Tooltip
+} from '@mui/material';
+import { AppContext } from '../AppContext';
 import ForgetPassword from './forgetPassword'
 
 //difine the user roles
@@ -34,11 +27,10 @@ const style = {
 };
 
 function Account() {
-  //import global variables
+  // Context for user account 
   const { userAccount, username, setUsername } = useContext(AppContext);
  // the state of the modules
   const [open, setOpen] = useState(false);
-  const [openuserinfo, setOpenuserinfo] = useState('');
   //set for log in
   const [loginid, setLoginid] = useState('');
   const [loginrole, setLoginrole] = React.useState('');
@@ -70,10 +62,7 @@ function Account() {
   const handleOpen = () => {
     if (username === '') {
       setOpen(true);
-    } else {
-      handleUserInfoOpen();
-    }
-  };
+  }};
  
   const handleClose = () => {
     setOpen(false);
@@ -82,7 +71,7 @@ function Account() {
     setShowConfirmation(false);
   };
 
-  //log in 
+  //log in check
   const handleAuth = () => {
     const userName = document.getElementById('UserName').value;
     const password = document.getElementById('Password').value;
@@ -128,20 +117,9 @@ function Account() {
       localStorage.removeItem('username');
       localStorage.removeItem('loginrole');
       localStorage.removeItem('loginid');
-      setOpenuserinfo(false);
       setShowConfirmation("");
     }
   };
-
-    //the function for open/close the interface of user informations.
-    const handleUserInfoOpen = () => {
-      setOpenuserinfo(true);
-    };
-
-    const handleUserInfoClose = () => {
-      setOpenuserinfo(false);
-    };
-
 
   return (
     <React.Fragment>
@@ -176,31 +154,25 @@ function Account() {
               Log in
             </Typography>
             <br />
-            
-            <React.Fragment>
-              <Typography>Account Role:</Typography>
-                <Autocomplete
-                  disablePortal
-                  id="combo-box-demo"
-                  options={user_roles}
-                  defaultValue={{ label: 'Student' }}
-                  sx={{ width: '100%' }}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              
-            </React.Fragment>
-
+            <Typography>Account Role:</Typography>
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={user_roles}
+                defaultValue={{ label: 'Student' }}
+                sx={{ width: '100%' }}
+                renderInput={(params) => <TextField {...params} />}
+              />
             <Typography>User Name:</Typography>
-            <Box
-              component="form"
-              sx={{
-                '& > :not(style)': { width: '100%' },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <TextField id={"UserName"} variant="outlined" />
-            </Box>
+              <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { width: '100%' },
+                }}
+                noValidate
+                autoComplete="off">   
+                <TextField id={"UserName"} variant="outlined" />
+              </Box>
 
             <Typography>Password:</Typography>
             <Box
@@ -214,13 +186,14 @@ function Account() {
               <TextField id={"Password"} variant="outlined" type="password" />
             </Box>
             <br/>
-
+              {/* add forget password module*/}
             <ForgetPassword/>
 
             <br/>
             
             {/*error message for the username exist for registering or other issues*/}
             {error && ( <Alert variant="outlined" severity="error">   {error}   </Alert> )}
+
             {/*success message*/}
                {showSuccessAlert && ( <Alert variant="outlined" severity="success">   {showSuccessAlert}   </Alert> )}
             <br/>
@@ -231,47 +204,6 @@ function Account() {
               </Button>
               <Button onClick={handleClose} variant="contained" color="grey">Cancel</Button>
             </Stack>
-          </Box>
-        </Modal>
-
-        {/*user information modal.*/}
-        <Modal
-          open={openuserinfo}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={{ ...style, width: '800px' }}>
-            <Typography id="modal-modal-title" variant="h6" component="h2" textAlign='center' fontWeight="bold">
-              User Information
-            </Typography>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h4 style={{ marginRight: '8px' }}>User ID:   </h4> 
-              <Typography>  {loginid}</Typography>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h4 style={{ marginRight: '8px' }}>User Account:   </h4> 
-              <Typography>  {username}</Typography>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-               <h4 style={{ marginRight: '8px' }}>User Role:   </h4>  
-               <Typography> {loginrole}</Typography>
-            </div>
-
-
-            {/*comfirm message*/}
-            <br/>
-            {showConfirmation &&( <Alert variant="outlined" severity="info">{showConfirmation}</Alert>)}
-            
-            {/*success message*/}
-            {showSuccessAlert && ( <Alert variant="outlined" severity="success"> {showSuccessAlert}</Alert> )}  
-            <br />
-            <Stack spacing={2} direction="row" justifyContent="center">
-              <Button onClick={handleUserInfoClose} variant="contained" color="grey">Close</Button>
-            </Stack>
-
           </Box>
         </Modal>
       </Toolbar>

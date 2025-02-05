@@ -1,24 +1,31 @@
 import React, { useContext, useState } from 'react';
-import Typography from '@mui/material/Typography';
-import EditIcon from '@mui/icons-material/Edit';
 import { 
-  Tooltip, Alert, TextField, Button, Dialog, 
-  DialogActions, DialogContent, DialogTitle 
+  Tooltip, Alert, TextField, Button, Dialog, Typography, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
-import { AppContext } from './AppContext';
+import EditIcon from '@mui/icons-material/Edit';
+import { AppContext } from '../AppContext';
 import axios from 'axios';
 
 function DisplayAccountInfo() {
-  //import global variables
+  // Context for user account management
   const { username, userAccount, setUserAccount } = useContext(AppContext);
+  
+  // Find current user information based on username
   const currentUserInfo = userAccount.find(user => user.name === username);
+
+  // State for updating password
   const [updatePassword, setUpdatePassword] = useState(false);
+  const [updatePasswordInfo, setUpdatePasswordInfo] = useState({});
+
+  // State for success or error message
   const [outSuccess, setOutSuccess] = useState('');
   const [error, setError] = useState('');
-  const [updatePasswordInfo, setUpdatePasswordInfo] = useState({});
   
+  // Function to handle saving updated password
   const handleSaveChanges = () => {
+    // Set user ID in updatePasswordInfo
     setUpdatePasswordInfo({ ...updatePasswordInfo, id: currentUserInfo.id })
+    // Validate required fields
     if (!updatePasswordInfo.oldPassword || !updatePasswordInfo.newPassword1 || !updatePasswordInfo.newPassword2) {
       setError("All fields are required.");
       setTimeout(() => {
@@ -26,6 +33,7 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
+    // Ensure new passwords match
     if (updatePasswordInfo.newPassword1 !== updatePasswordInfo.newPassword2) {
       setError("Two new passwords do not the same.");
       setTimeout(() => {
@@ -33,7 +41,7 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
-
+    // Verify old password correctness
     if (updatePasswordInfo.oldPassword !== currentUserInfo.password) {
       setError("Old password is incorrect.");
       setTimeout(() => {
@@ -41,7 +49,7 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
-
+    // Ensure the new password is different from the old one
     if (updatePasswordInfo.oldPassword === updatePasswordInfo.newPassword1) {
       setError("New password is the same as the old password");
       setTimeout(() => {
@@ -49,7 +57,7 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
-      // add user which means no id
+    // send user information to back end to update
     axios
       .post("/updatePassword", updatePasswordInfo )
       .then((response) => {
@@ -65,7 +73,7 @@ function DisplayAccountInfo() {
         console.error("Error adding user:", error);
     });
   };
-  
+  // Function to sum user grades
   const Sum = (grades) => {
     return grades.reduce((acc, grade) => acc + grade, 0);
   };
@@ -80,6 +88,8 @@ function DisplayAccountInfo() {
               {outSuccess}
             </Alert>
           )}
+          
+          {/* Display user details */}
           <Typography id="modal-modal-title" variant="h6" component="h2" textAlign="center" fontWeight="bold">
             User Information
           </Typography>
@@ -108,6 +118,7 @@ function DisplayAccountInfo() {
             <Typography>{currentUserInfo.name}</Typography>
           </div>
 
+          {/* Update Password module */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Password:</h4>
             <Tooltip title="Edit">
@@ -124,23 +135,23 @@ function DisplayAccountInfo() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h4 style={{ marginRight: '8px' }}>Quiz Sum Scores:</h4>
+            <h4 style={{ marginRight: '8px' }}>Practice Sum Scores:</h4>
             <Typography>
               {Sum(currentUserInfo.Grade)}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h4 style={{ marginRight: '8px' }}>Quiz Counts:</h4>
+            <h4 style={{ marginRight: '8px' }}>Practice Counts:</h4>
             <Typography>
               {currentUserInfo.Grade.length}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h4 style={{ marginRight: '8px' }}>Quiz Average Scores:</h4>
+            <h4 style={{ marginRight: '8px' }}>Practice Average Scores:</h4>
             <Typography>
-              {currentUserInfo.Grade.length? Sum(currentUserInfo.Grade)/currentUserInfo.Grade.length:0}
+              {currentUserInfo.Grade.length? (Sum(currentUserInfo.Grade)/currentUserInfo.Grade.length).toFixed(2):0}
             </Typography>
           </div>
           <br />
@@ -180,6 +191,7 @@ function DisplayAccountInfo() {
             style={{ marginTop: '20px' }}
             fullWidth
           />
+          {/* Error message in update password dialog */}
           {error && (
           <div>
             <br />

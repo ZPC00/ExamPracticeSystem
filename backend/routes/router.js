@@ -9,6 +9,6 @@ router.post('/updatePassword', userController.updatePassword);
 router.get('/getPracticeBank', userController.getPracticeBank);
 router.post('/deletePracticeQuestion', userController.deletePracticeQuestion);
 router.post('/savePracticeQusetion', userController.savePracticeQusetion);
-
+router.post('/excelPracticeUpdate', userController.excelPracticeUpdate);
 
 module.exports = router;

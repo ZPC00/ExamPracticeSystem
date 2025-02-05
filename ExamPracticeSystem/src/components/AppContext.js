@@ -4,12 +4,11 @@ import axios from 'axios';
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    const [userAccount, setUserAccount] = useState([]); 
-    const [username, setUsername] = useState('');
-    const [functs, setfuncts] = useState('');
-    const [practiceBank, setPracticeBank] = useState([]); 
-
-
+    const [username, setUsername] = useState('');      //log in current user
+    const [userAccount, setUserAccount] = useState([]);    // user list
+    const [practiceBank, setPracticeBank] = useState([]);  // practice bank
+    const [functs, setfuncts] = useState('');     // for changing display page
+   
 
     //load the user account from back end service
     useEffect(() => {

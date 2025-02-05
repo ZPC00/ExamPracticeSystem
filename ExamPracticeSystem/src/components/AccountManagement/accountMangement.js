@@ -1,15 +1,12 @@
 import React, { useState, useContext } from 'react';
-import { 
-  Table, TableBody, TableCell, TableHead, TableRow, Typography, 
-  Pagination, Tooltip, Alert, TextField, Button, Dialog, 
-  DialogActions, DialogContent, DialogTitle 
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, Tooltip, 
+  Alert, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle, Autocomplete 
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
-import { AppContext } from './AppContext';
+import { AppContext } from '../AppContext';
 import axios from 'axios';
-import Autocomplete from '@mui/material/Autocomplete';
+
 
 
 function Title({ children }) {
@@ -25,17 +22,22 @@ Title.propTypes = {
 };
 
 function AccountMangement() {
+  // Context for user account management
   const { userAccount, setUserAccount } = useContext(AppContext);
+  // Success or error message
+  const [error, setError] = useState("");
   const [outSuccess, setOutSuccess] = useState(null);
-  const [page, setPage] = useState(1);
+
+  // confirmation feature
   const [showConfirmation, setShowConfirmation] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+
+  // Edit account
   const [isEditingOrAdd, setIsEditingOrAdd] = useState(false);
   const [selectUser, setSelectUser] = useState("");
   const [updatedInfo, setUpdatedInfo] = useState({});
-  const [error, setError] = useState("");
 
-  const itemsPerPage = 11;
+  // Search filter
+  const [searchTerm, setSearchTerm] = useState("");
   const filteredUsers = userAccount.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -45,15 +47,18 @@ function AccountMangement() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 11;
   const pageCount = Math.ceil(filteredUsers.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedRows = filteredUsers.slice(startIndex, endIndex);
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+   // Handle user deletion with confirmation
   const handleDeleteUser = (userName) => {
     if (!showConfirmation) {
       setShowConfirmation("Click it again to delete");
@@ -79,14 +84,15 @@ function AccountMangement() {
     }
   };
 
+  // Handle user edit by setting selected user info
   const handleUpdateUser = (user) => {
     setSelectUser(user);
     setUpdatedInfo(user);
     setIsEditingOrAdd(true);
   };
 
+  // Handle saving user changes (both add and update operations)
   const handleSaveChanges = () => {
-  
     // check the user name exists.
     if (
       userAccount.some(
@@ -99,6 +105,7 @@ function AccountMangement() {
       }, 3000);
       return;
     }
+    // Validate required fields
     if (
       !(updatedInfo.name && updatedInfo.lastname && updatedInfo.firstname && updatedInfo.email && updatedInfo.password && updatedInfo.Loginrole)
       )
@@ -109,7 +116,8 @@ function AccountMangement() {
       }, 3000);
       return;
     }
-  
+    
+    // If user has an ID, update existing user, otherwise add new user
     if (updatedInfo.id) {
       // update user which have id
       axios
@@ -153,11 +161,14 @@ function AccountMangement() {
       <div style={{ display: 'flex', maxHeight: '100%', minWidth: '40%' }}>
         <div style={{ flex: 2, color: '#1976D2', marginLeft: '30px' }}>
           <br />
+          {/* Success message */}
           {outSuccess && (
             <Alert variant="outlined" severity="success">
               {outSuccess}
             </Alert>
           )}
+
+          {/* User management header and search */}
           <div
             style={{
               display: "flex",
@@ -181,6 +192,7 @@ function AccountMangement() {
               style={{ marginLeft: "auto" }}
             />
           </div>
+           {/* User table with pagination */}
           {paginatedRows.length > 0 ? (
             <Table size="large">
               <TableHead>

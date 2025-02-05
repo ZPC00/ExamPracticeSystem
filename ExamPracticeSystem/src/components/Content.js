@@ -6,7 +6,7 @@ import { AppContext } from './AppContext';
 
 
 export default function Content() {
-  //import global variables
+  // import global variables for change display page
   const { functs} = useContext(AppContext);
 
 
@@ -18,16 +18,12 @@ export default function Content() {
         elevation={0}
         sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
       >
+      {/* change display page */}
       <div style={{padding: '40px 50px'}}>
         {functs}
       </div>
 
-      </AppBar>
-      
-
-
-
-
+    </AppBar>
     </Paper>
   );
 }

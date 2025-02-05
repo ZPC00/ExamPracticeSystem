@@ -1,16 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { 
-  Table, TableBody, TableCell, TableHead, TableRow, Typography, 
-  Pagination, Tooltip, Alert, TextField, Button, Dialog, 
-  DialogActions, DialogContent, DialogTitle 
+  Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, 
+  Tooltip, Alert, TextField, Button, Dialog, DialogActions, DialogContent, 
+  DialogTitle, Autocomplete 
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { AppContext } from '../AppContext';
 import axios from 'axios';
-import Autocomplete from '@mui/material/Autocomplete';
-
+import * as XLSX from 'xlsx';
 
 function Title({ children }) {
   return (
@@ -25,17 +23,20 @@ Title.propTypes = {
 };
 
 function ManagePracticeBank() {
+  // Context to get and set practice questions
   const { practiceBank, setPracticeBank } = useContext(AppContext);
+  
+  // success or error alert
   const [outSuccess, setOutSuccess] = useState(null);
-  const [page, setPage] = useState(1);
-  const [showConfirmation, setShowConfirmation] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isEditingOrAdd, setIsEditingOrAdd] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState("");
-  const [updatedInfo, setUpdatedInfo] = useState({});
   const [error, setError] = useState("");
 
-  const itemsPerPage = 11;
+  // confirmation module
+  const [showConfirmation, setShowConfirmation] = useState("");
+
+
+
+  // Filter questions based on search term
+  const [searchTerm, setSearchTerm] = useState("");
   const filteredQuestion = practiceBank.filter(
     (question) =>
       (question.Question && question.Question.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -48,17 +49,24 @@ function ManagePracticeBank() {
       (question.correctAnswer && String(question.correctAnswer).toLowerCase().includes(searchTerm.toLowerCase())) ||
       (question.description && question.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-  
 
+  // Add or edit the question
+  const [isEditingOrAdd, setIsEditingOrAdd] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState("");
+  const [updatedInfo, setUpdatedInfo] = useState({});
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 11;
   const pageCount = Math.ceil(filteredQuestion.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedRows = filteredQuestion.slice(startIndex, endIndex);
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Handle deletion of a question with double click
   const handleDeleteQuestion = (id) => {
     if (!showConfirmation) {
       setShowConfirmation("Click it again to delete");
@@ -66,6 +74,7 @@ function ManagePracticeBank() {
         setShowConfirmation("");
       }, 2000);
     } else {
+      // delete and send backend to update
       axios
         .post('/deletePracticeQuestion', { id })
         .then((response) => {
@@ -84,12 +93,14 @@ function ManagePracticeBank() {
     }
   };
 
+  // Handle question update initiation
   const handleUpdateQuestion = (question) => {
     setSelectedQuestion(question);
     setUpdatedInfo(question);
     setIsEditingOrAdd(true);
   };
 
+  // Function to save for adding or updating a question
   const handleSaveChanges = () => {
   
     // check the question exists.
@@ -104,6 +115,8 @@ function ManagePracticeBank() {
       }, 3000);
       return;
     }
+
+    // set the input fields based on question type
     if (
       !( (updatedInfo.type==="Single Choice" && updatedInfo.A && updatedInfo.correctAnswer) || 
          (updatedInfo.type==="Multiple Choice" && updatedInfo.A && updatedInfo.B && updatedInfo.correctAnswer) ||
@@ -117,9 +130,10 @@ function ManagePracticeBank() {
       }, 3000);
       return;
     }
-  
+    // update question which have id
     if (updatedInfo.id) {
-      // update question which have id
+
+      // send backend to update
       axios
         .post("/savePracticeQusetion", updatedInfo)
         .then((response) => {
@@ -135,8 +149,10 @@ function ManagePracticeBank() {
         .catch((error) => {
           console.error("Error updating question:", error);
         });
-    } else {
-      // add question which means no id
+    } 
+    // add question which means no id
+    else {
+      // send backend to update
       axios
         .post("/savePracticeQusetion", updatedInfo )
         .then((response) => {
@@ -154,26 +170,89 @@ function ManagePracticeBank() {
         });
     }
   };
+
+  // Handle file upload for importting the questions
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
   
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];  // first sheet of the excel
+      const sheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      
+      // handle there is no data
+      if (jsonData.length < 2) {
+        console.warn("there is no data");
+        return;
+      }
+  
+      // jump the title row and pack the import questions
+      const excelUpdateData = jsonData.slice(1).map((row) => ({
+        type: row[0] ? String(row[0]).trim() : '',
+        Question: row[1] ? String(row[1]).trim() : '',
+        A: row[2] ? String(row[2]).trim() : '',
+        B: row[3] ? String(row[3]).trim() : '',
+        C: row[4] ? String(row[4]).trim() : '',
+        D: row[5] ? String(row[5]).trim() : '',
+        E: row[6] ? String(row[6]).trim() : '',
+        correctAnswer: row[7] ? String(row[7]).trim() : '',
+        description: row[8] ? String(row[8]).trim() : '',
+      }));
+
+      // send to backend to update
+      axios
+        .post("/excelPracticeUpdate", excelUpdateData)
+        .then((response) => {
+          setPracticeBank(response.data.updatedPracticeQuestion);
+          alert(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Add question failed:", error);
+        });
+    };
+    reader.readAsArrayBuffer(file);
+  };
   
   return (
     <div>
       <div style={{ display: 'flex', maxHeight: '100%', minWidth: '40%' }}>
         <div style={{ flex: 2, color: '#1976D2', marginLeft: '30px' }}>
           <br />
+
+          {/* Alert module*/}
           {outSuccess && (
             <Alert variant="outlined" severity="success">
               {outSuccess}
             </Alert>
           )}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px",
-            }}
+          {/* add question module contains add module and import excel*/}
+      <div
+        style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px",}}>
+
+          {/*upload excel botton*/}
+          <Button
+            variant="contained"
+            component="label"
+            startIcon={<UploadFileIcon />}
+            sx={{ mr: 2 }}
           >
+          Import Excel
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          hidden
+          onChange={handleFileUpload}/>
+
+        {/* Add quesion botton*/}
+          </Button>
             <Button onClick={() => { setSelectedQuestion(""); setUpdatedInfo({});setIsEditingOrAdd(true)}} variant="contained" sx={{ mr: 1 }}>
               Add Question
             </Button>
@@ -187,9 +266,10 @@ function ManagePracticeBank() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ marginLeft: "auto" }}
-            />
+          />
           </div>
 
+          {/* display questions table */}
           {paginatedRows.length > 0 ? (
             <Table size="large">
               <TableHead>
@@ -228,6 +308,7 @@ function ManagePracticeBank() {
                         alignItems: 'center',
                       }}
                     >
+                      {/* double click to delete module*/}
                       <Tooltip
                         title={
                           showConfirmation ? "Click it again to delete" : "Double click to delete"
@@ -238,6 +319,8 @@ function ManagePracticeBank() {
                           size="small"
                         />
                       </Tooltip>
+
+                      {/* edit question module*/}
                       <Tooltip title="Edit">
                         <EditIcon
                           onClick={() => handleUpdateQuestion(row)}
@@ -263,6 +346,8 @@ function ManagePracticeBank() {
       <Dialog open={isEditingOrAdd} onClose={() => setIsEditingOrAdd(false)}>
         <DialogTitle style={{ minWidth: '1000px' }}>{selectedQuestion ? "Edit Question" : "Add New Question"}</DialogTitle>
         <DialogContent>
+
+          {/* only edit display and can't be modified*/}
           {selectedQuestion&&(<TextField
             label="Question ID"
             value={updatedInfo.id || ''}
@@ -270,6 +355,7 @@ function ManagePracticeBank() {
             fullWidth
             InputProps={{ readOnly: true }}
           />)}
+
           <Autocomplete
             disablePortal
             options={['Single Choice', 'Filling Blank', 'Multiple Choice','Judgements']}
@@ -286,6 +372,7 @@ function ManagePracticeBank() {
             style={{ marginTop: '20px' }}
             fullWidth
           />
+          {/* only display which the type of quesiton is choice*/}
           {(updatedInfo.type === 'Single Choice' || updatedInfo.type === 'Multiple Choice')&&(
           <div>
           <TextField
@@ -325,6 +412,8 @@ function ManagePracticeBank() {
           />
           </div>
           )}
+
+          {/* only display which the type of quesiton is single choice*/}
           {(updatedInfo.type === 'Single Choice')&&(
           <Autocomplete
             disablePortal
@@ -336,7 +425,7 @@ function ManagePracticeBank() {
             renderInput={(params) => <TextField {...params} label="Correct Answerer" />}
           />)}
 
-
+          {/* only display which the type of quesiton is multiple choice*/}
           {updatedInfo.type === 'Multiple Choice' && (
               <TextField
                 label="Correct Answerer"
@@ -358,6 +447,7 @@ function ManagePracticeBank() {
             )
           }
 
+          {/* only display which the type of quesiton is filling blank*/}
           {(updatedInfo.type === 'Filling Blank')&&(
           <TextField
             label="Correct Answerer"
@@ -367,6 +457,7 @@ function ManagePracticeBank() {
             fullWidth
           /> )}
 
+          {/* only display which the type of quesiton is Judgements*/}
           {(updatedInfo.type === 'Judgements')&&(
           <Autocomplete
             disablePortal
@@ -386,7 +477,8 @@ function ManagePracticeBank() {
           style={{ marginTop: '20px' }}
           fullWidth
         />
-
+          
+          {/* error allert to notice the users*/}
           {error && (
           <Alert variant="outlined" severity="error" style={{ marginTop: '20px' }}>
             {error}

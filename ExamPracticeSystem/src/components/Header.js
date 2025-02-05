@@ -1,17 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import HelpIcon from '@mui/icons-material/Help';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import Account from './Account.js';
+import { AppBar, Grid, IconButton, Link, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Help as HelpIcon, Menu as MenuIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
+import Account from './AccountManagement/Account';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -20,6 +11,8 @@ function Header(props) {
 
   return (
     <React.Fragment>
+
+      {/* Top navigation bar */}
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
@@ -34,6 +27,7 @@ function Header(props) {
               </IconButton>
             </Grid>
 
+          {/* Documentation link */}
           <Grid item xs />
             <Grid item>
               <Link
@@ -53,6 +47,7 @@ function Header(props) {
               </Link>
             </Grid>
 
+          {/* Notifications icon */}
           <Grid item>
               <Tooltip title="Alerts • No alerts">
                 <IconButton color="inherit">
@@ -79,20 +74,12 @@ function Header(props) {
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                Quiz 
+                Practice Exam System
               </Typography>
             </Grid>
             <Grid item>
-              <Button
-                sx={{ borderColor: lightColor }}
-                variant="outlined"
-                color="inherit"
-                size="small"
-              >
-                Web setup
-              </Button>
-            </Grid>
-            <Grid item>
+
+              {/*help icon*/}
               <Tooltip title="Help">
                 <IconButton color="inherit">
                   <HelpIcon />

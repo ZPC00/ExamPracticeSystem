@@ -1,26 +1,17 @@
 import * as React from 'react';
 import { useContext } from 'react';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import Box from '@mui/material/Box';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import HomeIcon from '@mui/icons-material/Home';
-import PeopleIcon from '@mui/icons-material/People';
-import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
-import SettingsIcon from '@mui/icons-material/Settings';
-import TimerIcon from '@mui/icons-material/Timer';
+import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Home as HomeIcon, People as PeopleIcon, DnsRounded as DnsRoundedIcon, Settings as SettingsIcon, Timer as TimerIcon } from '@mui/icons-material';
 import { AppContext } from './AppContext';
-import DisplayAccountInfo from './displayAccountInfo';
-import AccountMangement from './accountMangement'
+import DisplayAccountInfo from './AccountManagement/displayAccountInfo';
+import AccountMangement from './AccountManagement/accountMangement'
 import ManagePracticeBank from './PracticeBank/managePracticeBank'
+import PracticeGrades from './GradesView/PracticeGrades';
 
 
 const iconColor = 'rgba(255, 255, 255, 0.7)';
 
+// categories list
 const categories = [
   {
     id: 'Student',
@@ -33,7 +24,7 @@ const categories = [
     id: 'Teacher',
     children: [
       { id: 'Pratice Bank Management', icon: <SettingsIcon sx={{ color: iconColor }} />, activeModule:<ManagePracticeBank/> },
-      { id: 'View Grade', icon: <TimerIcon sx={{ color: iconColor }} /> },
+      { id: 'View Practice Grades', icon: <TimerIcon sx={{ color: iconColor }} /> , activeModule:<PracticeGrades/>},
     ],
   },
   {
@@ -61,29 +52,32 @@ const itemCategory = {
 
 export default function Navigator(props) {
   const { ...other } = props;
+  
+  // Context for user account and functs
   const { username, userAccount, setfuncts } = useContext(AppContext);
+
+  // current user role
   const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
 
-  // filter categories by currentUserRole
+  // log in control by filtering display categories by currentUserRole
   const isCategoryVisible = (category) => {
   if (category.id === 'Student' && (currentUserRole === 'Student' || currentUserRole === 'Administrator')) return true;
   if (category.id === 'Teacher' && (currentUserRole === 'Teacher' || currentUserRole === 'Administrator')) return true;
   if (category.id === 'Management'& (currentUserRole === 'Administrator' || currentUserRole === 'Student' || currentUserRole === 'Teacher')) return true;
   return false;
 };
+  const filteredCategories = categories
+   .filter(category => isCategoryVisible(category, currentUserRole))
+   .map(category => ({
+     ...category,
+     children: category.children.filter(child => {
+       if (child.id === 'Account Management' && currentUserRole !== 'Administrator') return false;
+       if (child.id === 'Account Information' && (currentUserRole !== 'Administrator' && currentUserRole !== 'Student' && currentUserRole !== 'Teacher')) return false;
+       return true;
+      }),
+   }));
 
-const filteredCategories = categories
-  .filter(category => isCategoryVisible(category, currentUserRole))
-  .map(category => ({
-    ...category,
-    children: category.children.filter(child => {
-      if (child.id === 'Account Management' && currentUserRole !== 'Administrator') return false;
-      if (child.id === 'Account Information' && (currentUserRole !== 'Administrator' && currentUserRole !== 'Student' && currentUserRole !== 'Teacher')) return false;
-      return true;
-    }),
-  }));
-
-
+  // function to change the display module
   const handleModuleClick = (module) => {
     setfuncts(module);
   };
@@ -106,6 +100,7 @@ const filteredCategories = categories
         <ListItem sx={{ ...item, ...itemCategory, fontSize: 22, color: '#fff' }}>
           Clark University
         </ListItem>
+        
         {/* Project Overview */}
         <ListItem sx={{ ...item, ...itemCategory }}>
           <ListItemIcon>

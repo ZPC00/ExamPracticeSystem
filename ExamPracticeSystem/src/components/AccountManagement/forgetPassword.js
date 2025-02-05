@@ -1,26 +1,38 @@
 import React, { useState, useContext } from "react";
 import { Typography, TextField, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from "@mui/material";
 import PropTypes from "prop-types";
-import { AppContext } from "./AppContext";
+import { AppContext } from "../AppContext";
 import axios from 'axios';
 
 function ForgetPassword() {
+  // Context for user account 
+  const { userAccount,setUserAccount } = useContext(AppContext);
+  // State for open/close the dialog
   const [open, setOpen] = useState(false);
+  
+  // State for storing user input
   const [forgetPassword1, setForgetPassword1] = useState("");
   const [forgetPassword2, setForgetPassword2] = useState("");
   const [resetCode, setResetCode] = useState("");
+  const [updatePasswordInfo, setUpdatePasswordInfo] = useState({});    // Object storing user information for password update
+
+  // State to store the randomly generated reset code
+  const [randomNo, setRandomNo] = useState("");
+
+  // State for error or success message
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  
+  // State to track whether the user has passed the first step of verification
   const [resetPasswordState, setResetPasswordState] = useState(false);
-  const [randomNo, setRandomNo] = useState("");
-  const [updatePasswordInfo, setUpdatePasswordInfo] = useState({});
-  const { userAccount,setUserAccount } = useContext(AppContext);
 
+  // Function to close the dialog and reset the form
   const handleClose = () => {
     setOpen(false);
     resetForm();
   };
 
+  // Function to reset form fields
   const resetForm = () => {
     setError("");
     setSuccessMessage("");
@@ -30,22 +42,32 @@ function ForgetPassword() {
     setResetPasswordState(false);
   };
 
+  // Function to validate user input and proceed to the reset step
   const handleContinue = async () => {
     if (!forgetPassword1 || !forgetPassword2) {
       setError("Both fields are required!");
       setTimeout(() => setError(""), 3000);
       return;
     }
-
+  
+  // Check if the entered username and email match an existing user
   const matchedUser = userAccount.find(
       (user) => user.name === forgetPassword1 && user.email === forgetPassword2
     );
 
     if (matchedUser) {
+
+      // Store the user's ID for later password update
       setUpdatePasswordInfo({...updatePasswordInfo, id: matchedUser.id })
+
+      // Clear input fields
       setForgetPassword1("");
       setForgetPassword2("");
+
+      // Move to the password reset step
       setResetPasswordState(true);
+
+      // Generate a random 6-digit reset code which assume send to email
       const randomNo = Math.floor(100000 + Math.random() * 900000);
       setRandomNo(randomNo);
       setTimeout(() => {
@@ -57,19 +79,23 @@ function ForgetPassword() {
     }
   };
 
+  // Function to handle password reset process
   const handleReset = async () => {
+    // check the entered reset code matches the generated one
     if (String(resetCode) !== String(randomNo)) {
       setError("Reset code incorrect");
       setTimeout(() => setError(""), 3000);
       return;
     }
 
+    // Ensure that the two entered passwords match
     if (forgetPassword1 !== forgetPassword2) {
       setError("Two new passwords do not match.");
       setTimeout(() => setError(""), 3000);
       return;
     }
 
+    // pack password information object with new passwords
     setUpdatePasswordInfo(prevState => ({
       ...prevState,
       oldPassword: "",
@@ -77,6 +103,7 @@ function ForgetPassword() {
       newPassword2: forgetPassword2
     }));
 
+    // send to backend to update password
     setTimeout(() =>     
     axios
     .post("/updatePassword", updatePasswordInfo )
@@ -100,6 +127,7 @@ function ForgetPassword() {
 
   return (
     <div>
+      {/* Button to open the forget password dialog */}
       <Typography
         variant="body2"
         color="primary"
@@ -108,16 +136,19 @@ function ForgetPassword() {
       >
         Forget the password?
       </Typography>
-
+      
+      {/* Dialog for password reset */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Reset Password</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+          {/* check User name or new password input field */}
           <DialogContentText>
             {resetPasswordState
               ? "Your account information matches. Please input your new password."
               : "Enter your account's username and email address to get reset code."}
           </DialogContentText>
-
+      
           <TextField
             label={resetPasswordState ? "Input New Password" : "User Name"}
             value={forgetPassword1}
@@ -146,9 +177,11 @@ function ForgetPassword() {
               fullWidth
             />
           )}
-
+          
+          {/* error message or successful message */}
           {error && <Typography color="error">{error}</Typography>}
           {successMessage && (<Alert variant="outlined" severity="success">{successMessage}</Alert>)}
+          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
@@ -161,6 +194,7 @@ function ForgetPassword() {
   );
 }
 
+// Prop validation for component
 ForgetPassword.propTypes = {
   handleClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
