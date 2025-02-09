@@ -88,11 +88,11 @@ function DisplayAccountInfo() {
               {outSuccess}
             </Alert>
           )}
-          
+
           {/* Display user details */}
-          <Typography id="modal-modal-title" variant="h6" component="h2" textAlign="center" fontWeight="bold">
-            User Information
-          </Typography>
+          <h1 style={{ flexGrow: 1, textAlign: "center", color: '#1976D2', margin: 0 }}>
+              User Information
+          </h1>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>User ID:</h4>
             <Typography>{currentUserInfo.id}</Typography>

@@ -188,7 +188,7 @@ function AccountMangement() {
               variant="standard"
               margin="normal"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {setPage(1);setSearchTerm(e.target.value)}}
               style={{ marginLeft: "auto" }}
             />
           </div>
@@ -215,13 +215,8 @@ function AccountMangement() {
                     <TableCell>{row.lastname}</TableCell>
                     <TableCell>{row.Loginrole}</TableCell>
                     <TableCell>{row.email}</TableCell>
-                    <TableCell
-                      style={{
-                        display: 'flex',
-                        height: '55px',
-                        alignItems: 'center',
-                      }}
-                    >
+                    <TableCell>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Tooltip
                         title={
                           showConfirmation ? "Click it again to delete" : "Double click to delete"
@@ -238,6 +233,7 @@ function AccountMangement() {
                           style={{ marginLeft: '10px' }}
                         />
                       </Tooltip>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

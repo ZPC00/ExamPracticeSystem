@@ -7,6 +7,8 @@ import DisplayAccountInfo from './AccountManagement/displayAccountInfo';
 import AccountMangement from './AccountManagement/accountMangement'
 import ManagePracticeBank from './PracticeBank/managePracticeBank'
 import PracticeGrades from './GradesView/PracticeGrades';
+import PracticeSequential from './PracticeBank/PracticeSequential'
+import PracticeDisorder from './PracticeBank/PracticeDisorder'
 
 
 const iconColor = 'rgba(255, 255, 255, 0.7)';
@@ -16,8 +18,8 @@ const categories = [
   {
     id: 'Student',
     children: [
-      { id: 'Sequential Quiz', icon: <PeopleIcon sx={{ color: iconColor }} /> },
-      { id: 'Disordered Quiz', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> },
+      { id: 'Sequential Quiz', icon: <PeopleIcon sx={{ color: iconColor }} /> , activeModule:<PracticeSequential/>},
+      { id: 'Disordered Quiz', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> , activeModule:<PracticeDisorder/>},
     ],
   },
   {
@@ -54,7 +56,7 @@ export default function Navigator(props) {
   const { ...other } = props;
   
   // Context for user account and functs
-  const { username, userAccount, setfuncts } = useContext(AppContext);
+  const { username, userAccount, setfuncts,functs } = useContext(AppContext);
 
   // current user role
   const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
@@ -78,8 +80,13 @@ export default function Navigator(props) {
    }));
 
   // function to change the display module
-  const handleModuleClick = (module) => {
-    setfuncts(module);
+  const handleModuleClick = async (module) => {
+    if (functs===module){
+     
+     setfuncts("")  
+     setTimeout(() => setfuncts(module), 0);
+  } else
+  {setfuncts(module);}
   };
 
   return (

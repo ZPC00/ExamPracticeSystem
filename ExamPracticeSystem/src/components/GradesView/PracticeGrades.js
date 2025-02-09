@@ -23,9 +23,10 @@ function PracticeGrades() {
   const [searchTerm, setSearchTerm] = useState("");
   const filteredUsers = userAccount.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.Loginrole === "Student"  &&                      // only display the students' grades
+    ( user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastname.toLowerCase().includes(searchTerm.toLowerCase())
+      user.lastname.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
     // Function to sum user grades

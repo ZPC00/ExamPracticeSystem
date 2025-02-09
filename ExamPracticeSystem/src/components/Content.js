@@ -19,7 +19,7 @@ export default function Content() {
         sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
       >
       {/* change display page */}
-      <div style={{padding: '40px 50px'}}>
+      <div style={{padding: '10px 20px'}}>
         {functs}
       </div>
 

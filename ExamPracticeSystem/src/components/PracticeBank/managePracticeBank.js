@@ -4,11 +4,12 @@ import {
   Tooltip, Alert, TextField, Button, Dialog, DialogActions, DialogContent, 
   DialogTitle, Autocomplete 
 } from '@mui/material';
-import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon, ReportProblem as ReportProblemIcon} from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { AppContext } from '../AppContext';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+
 
 function Title({ children }) {
   return (
@@ -32,6 +33,7 @@ function ManagePracticeBank() {
 
   // confirmation module
   const [showConfirmation, setShowConfirmation] = useState("");
+  
 
 
 
@@ -102,19 +104,6 @@ function ManagePracticeBank() {
 
   // Function to save for adding or updating a question
   const handleSaveChanges = () => {
-  
-    // check the question exists.
-    if (
-      practiceBank.some(
-        (question) => question.Question === updatedInfo.Question && question.id !== updatedInfo.id
-      )
-    ) {
-      setError("Question already exists. Please choose another one.");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-      return;
-    }
 
     // set the input fields based on question type
     if (
@@ -208,7 +197,7 @@ function ManagePracticeBank() {
         .post("/excelPracticeUpdate", excelUpdateData)
         .then((response) => {
           setPracticeBank(response.data.updatedPracticeQuestion);
-          alert(response.data.message);
+          alert(`${response.data.message} Please review the correctness of these questions!`);
         })
         .catch((error) => {
           console.error("Add question failed:", error);
@@ -264,7 +253,7 @@ function ManagePracticeBank() {
               variant="standard"
               margin="normal"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {setPage(1);setSearchTerm(e.target.value)}}
               style={{ marginLeft: "auto" }}
           />
           </div>
@@ -285,6 +274,7 @@ function ManagePracticeBank() {
                   <TableCell>Correct Answerer</TableCell>
                   <TableCell>Description</TableCell>
                   <TableCell>Incorrect Counts</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -301,13 +291,8 @@ function ManagePracticeBank() {
                     <TableCell>{row.correctAnswer}</TableCell>
                     <TableCell>{row.description}</TableCell>
                     <TableCell>{row.inCorrectCount}</TableCell>
-                    <TableCell
-                      style={{
-                        display: 'flex',
-                        height: '55px',
-                        alignItems: 'center',
-                      }}
-                    >
+                    <TableCell>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {/* double click to delete module*/}
                       <Tooltip
                         title={
@@ -327,6 +312,51 @@ function ManagePracticeBank() {
                           style={{ marginLeft: '10px' }}
                         />
                       </Tooltip>
+
+                      {(() => {
+                          let problemReport = "";
+                          if (row.type === "Single Choice") {
+                              const isValid = /^[ABCDE]+$/.test(row.correctAnswer)
+                              if (!row.A) {
+                                problemReport = "You should have at least 1 optional choice!";
+                              } else if (row.correctAnswer.length !== 1) {
+                                problemReport = "Only 1 choice can be chosen!";
+                              }
+                              else if (!isValid) {
+                                problemReport = "Only A B C D E are available";
+                              }
+                            } else if (row.type === "Multiple Choice") {
+                              const isValid = /^[ABCDE]+$/.test(row.correctAnswer)
+                              const choices = [row.A, row.B, row.C, row.D, row.E].filter(Boolean);
+                              if (choices.length < 2) {
+                                problemReport = "At least 2 optional choices (A and B) are required!";
+                              } else if (row.correctAnswer.length < 1 || row.correctAnswer.length > 5) {
+                                problemReport = "Correct answers must be between 1 and 5 choices!";
+                              }
+                              else if (!isValid) {
+                                problemReport = "Only A B C D E are available";
+                              }
+                            } else if (row.type === "Filling Blank") {
+                              if (!row.correctAnswer) {
+                                problemReport = "The correct answer is required!";
+                              }
+                            } else if (row.type === "Judgements") {
+                             if (row.correctAnswer !== "True" && row.correctAnswer !== "False") {
+                                problemReport = 'The correct answer must be "True" or "False"!';
+                              }
+                            }
+                            else if (!row.question) {
+                                 problemReport = 'Question title is required.';
+                             }
+                            return (
+                              problemReport && (
+                                <Tooltip title={problemReport}>
+                                  <ReportProblemIcon style={{ color: "red" }} />
+                                </Tooltip>
+                              )
+                            );
+                          })()}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

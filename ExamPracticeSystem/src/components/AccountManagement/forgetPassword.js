@@ -81,49 +81,38 @@ function ForgetPassword() {
 
   // Function to handle password reset process
   const handleReset = async () => {
-    // check the entered reset code matches the generated one
     if (String(resetCode) !== String(randomNo)) {
       setError("Reset code incorrect");
       setTimeout(() => setError(""), 3000);
       return;
     }
-
-    // Ensure that the two entered passwords match
+  
     if (forgetPassword1 !== forgetPassword2) {
       setError("Two new passwords do not match.");
       setTimeout(() => setError(""), 3000);
       return;
     }
-
-    // pack password information object with new passwords
-    setUpdatePasswordInfo(prevState => ({
-      ...prevState,
-      oldPassword: "",
+  
+    setUpdatePasswordInfo({
+      id: updatePasswordInfo.id,
       newPassword1: forgetPassword1,
-      newPassword2: forgetPassword2
-    }));
-
-    // send to backend to update password
-    setTimeout(() =>     
-    axios
-    .post("/updatePassword", updatePasswordInfo )
-    .then((response) => {
+      newPassword2: forgetPassword2,
+    });
+  
+    // send to back end to update and use await in async to make sure send the complete data
+    try {
+      const response = await axios.post("/updatePassword", updatePasswordInfo);
       setUserAccount(response.data.updatedUserAccount);
-      setSuccessMessage("Password reset successful!");          
+      setSuccessMessage("Password reset successful!");
       setTimeout(() => {
         setSuccessMessage("");
-        handleClose()
+        handleClose();
       }, 3000);
-    })
-    .catch((error) => {
-      console.error("Error adding user:", error);
-  }), 500);
-
-
-    console.log(updatePasswordInfo)
-
-    
+    } catch (error) {
+      console.error("Error resetting password:", error);
+    }
   };
+  
 
   return (
     <div>
@@ -181,7 +170,7 @@ function ForgetPassword() {
           {/* error message or successful message */}
           {error && <Typography color="error">{error}</Typography>}
           {successMessage && (<Alert variant="outlined" severity="success">{successMessage}</Alert>)}
-          
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
