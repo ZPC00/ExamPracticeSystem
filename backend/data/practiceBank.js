@@ -32,7 +32,7 @@ let practiceBank = [
   { id: "00000030", type: "Filling Blank", Question: "6+6=__", A: "", B: "", C: "", D: "", E: "", correctAnswer: "12", description: "Simple addition.", inCorrectCount: 0 },
   { id: "00000031", type: "Multiple Choice", Question: "Prime numbers in [1, 2, 3, 5]?", A: "1", B: "2", C: "3", D: "5", E: "", correctAnswer: "BCD", description: "Prime numbers have no divisors other than 1 and themselves.", inCorrectCount: 0 },
   { id: "00000032", type: "Multiple Choice", Question: "Odd numbers in [2, 4, 6, 7]?", A: "2", B: "4", C: "6", D: "7", E: "", correctAnswer: "D", description: "Select the odd numbers.", inCorrectCount: 0 },
-  { id: "00000033", type: "Multiple Choice", Question: "Factors of 8 in [1, 2, 3, 4]?", A: "1", B: "2", C: "3", D: "4", E: "", correctAnswer: "ABCD", description: "Factors of a number divide it exactly.", inCorrectCount: 0 },
+  { id: "00000033", type: "Multiple Choice", Question: "Factors of 8 in [1, 2, 3, 4]?", A: "1", B: "2", C: "3", D: "4", E: "", correctAnswer: "ABD", description: "Factors of a number divide it exactly.", inCorrectCount: 0 },
   { id: "00000034", type: "Multiple Choice", Question: "Numbers less than 5 in [1, 2, 5, 6]?", A: "1", B: "2", C: "5", D: "6", E: "", correctAnswer: "AB", description: "Select the numbers smaller than 5.", inCorrectCount: 0 },
   { id: "00000035", type: "Multiple Choice", Question: "Even numbers in [1, 2, 4, 6]?", A: "1", B: "2", C: "4", D: "6", E: "", correctAnswer: "BCDE", description: "Even numbers are divisible by 2.", inCorrectCount: 0 },
   { id: "00000036", type: "Judgements", Question: "3+3=6", A: "", B: "", C: "", D: "", E: "", correctAnswer: "True", description: "Check the addition.", inCorrectCount: 0 },

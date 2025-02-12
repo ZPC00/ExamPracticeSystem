@@ -39,6 +39,7 @@ function ManagePracticeBank() {
 
   // Filter questions based on search term
   const [searchTerm, setSearchTerm] = useState("");
+  
   const filteredQuestion = practiceBank.filter(
     (question) =>
       (question.Question && question.Question.toLowerCase().includes(searchTerm.toLowerCase())) ||

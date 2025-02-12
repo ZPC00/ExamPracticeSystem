@@ -10,5 +10,7 @@ router.get('/getPracticeBank', userController.getPracticeBank);
 router.post('/deletePracticeQuestion', userController.deletePracticeQuestion);
 router.post('/savePracticeQusetion', userController.savePracticeQusetion);
 router.post('/excelPracticeUpdate', userController.excelPracticeUpdate);
+router.post('/updatePracticeResult', userController.updatePracticeResult);
+
 
 module.exports = router;

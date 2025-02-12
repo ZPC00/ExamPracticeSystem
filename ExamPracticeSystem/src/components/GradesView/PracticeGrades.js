@@ -71,7 +71,7 @@ function PracticeGrades() {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const itemsPerPage = 11;
+  const itemsPerPage = 10;
   const pageCount = Math.ceil(sortedUsers.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;

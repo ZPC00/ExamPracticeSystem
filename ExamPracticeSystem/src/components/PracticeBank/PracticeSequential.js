@@ -27,8 +27,8 @@ function PracticeSequential() {
     
     // sort the correct answer letters to compare the correctness of the questions it its type is Choice
     if (QuestionType === "Single Choice" || QuestionType === "Multiple Choice") {
-      handleUserAnswer = userAnswer.split("").sort().join("").toUpperCase();
-      handleCorrectAnswer = currentQuestion.correctAnswer.split("").sort().join("").toUpperCase();
+      handleUserAnswer = userAnswer.split(",").map(s => s.trim()).sort().join(",").toUpperCase();
+      handleCorrectAnswer = currentQuestion.correctAnswer.split("").map(s => s.trim()).sort().join(",").toUpperCase();
     }
     
     // define the correctness of users' answers

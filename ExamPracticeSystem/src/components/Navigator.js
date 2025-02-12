@@ -9,6 +9,7 @@ import ManagePracticeBank from './PracticeBank/managePracticeBank'
 import PracticeGrades from './GradesView/PracticeGrades';
 import PracticeSequential from './PracticeBank/PracticeSequential'
 import PracticeDisorder from './PracticeBank/PracticeDisorder'
+import PracticeMockExam from './PracticeBank/PracticeMockExam';
 
 
 const iconColor = 'rgba(255, 255, 255, 0.7)';
@@ -20,6 +21,7 @@ const categories = [
     children: [
       { id: 'Sequential Quiz', icon: <PeopleIcon sx={{ color: iconColor }} /> , activeModule:<PracticeSequential/>},
       { id: 'Disordered Quiz', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> , activeModule:<PracticeDisorder/>},
+      { id: 'Mock Exam', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> , activeModule:<PracticeMockExam/>}
     ],
   },
   {

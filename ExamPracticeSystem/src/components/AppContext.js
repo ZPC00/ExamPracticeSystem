@@ -31,6 +31,9 @@ export const AppProvider = ({ children }) => {
             console.error('Error fetching product data:', error);
           });
         }, []);
+    
+    
+    
 
     return (
         <AppContext.Provider value={{ userAccount, setUserAccount, username, setUsername, functs, setfuncts, practiceBank, setPracticeBank }}>

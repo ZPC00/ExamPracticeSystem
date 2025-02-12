@@ -219,3 +219,38 @@ exports.excelPracticeUpdate = (req, res) => {
 };
 
 
+  // update Practice mock exam Result
+  exports.updatePracticeResult = (req, res) => {
+    let { loginUsername, practiceScore, IncorrectQList } = req.body;
+
+    console.log("Received request body:", req.body);
+
+    const selectedUser = userAccount.find(user => user.name === loginUsername);
+    if (selectedUser) {
+      // Update the Grade information by adding the practiceScore
+      selectedUser.Grade.push(practiceScore);
+
+      // Iterate over IncorrectQList and update inCorrectCount
+      IncorrectQList.forEach(qID => {
+        practiceBank.forEach(q => {
+          if (q.id === qID) {
+            q.inCorrectCount += 1;
+          }
+        });
+      });
+      
+      return res.status(201).json({
+        message: "Practice result updated successfully",
+        updatedPracticeQuestion: practiceBank,
+        updatedUserAccount:userAccount
+      });
+    } else {
+      res.status(404).send("User not found");
+    }
+  };
+  
+
+
+
+
+
