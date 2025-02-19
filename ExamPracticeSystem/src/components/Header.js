@@ -73,7 +73,7 @@ function Header(props) {
         <Toolbar>
           <Grid container spacing={1} sx={{ alignItems: 'center' }}>
             <Grid item xs>
-              <Typography color="inherit" variant="h5" component="h1">
+              <Typography color="inherit" variant="h5" component="h1" fontWeight="bold">
                 Practice Exam System
               </Typography>
             </Grid>

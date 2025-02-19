@@ -33,10 +33,10 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
         }}
       >
         <h3 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
-          Question Counts: {attempts.length}
+          Total Score: {attempts.length}
         </h3>
         <h3 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
-          Correct Counts: {PracticeScore}
+          Your Grade: {PracticeScore}
         </h3>
         <h3 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
           Correct Percent: {attempts.length > 0 ? ((PracticeScore / attempts.length) * 100).toFixed(2) + "%" : "0%"}

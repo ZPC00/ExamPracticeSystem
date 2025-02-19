@@ -41,14 +41,14 @@ function PracticeGrades() {
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     let valueA, valueB;
     if (sortBy === "sum") {
-      valueA = Sum(a.Grade);
-      valueB = Sum(b.Grade);
+      valueA = Sum(a.practiceGradesList);
+      valueB = Sum(b.practiceGradesList);
     } else if (sortBy === "count") {
-      valueA = a.Grade.length;
-      valueB = b.Grade.length;
+      valueA = a.practiceGradesList.length;
+      valueB = b.practiceGradesList.length;
     } else if (sortBy === "average") {
-      valueA = a.Grade.length ? Sum(a.Grade) / a.Grade.length : 0;
-      valueB = b.Grade.length ? Sum(b.Grade) / b.Grade.length : 0;
+      valueA = a.practiceGradesList.length ? Sum(a.practiceGradesList) / a.practiceGradesList.length : 0;
+      valueB = b.practiceGradesList.length ? Sum(b.practiceGradesList) / b.practiceGradesList.length : 0;
     } else {
       valueA = a[sortBy];
       valueB = b[sortBy];
@@ -183,9 +183,9 @@ function PracticeGrades() {
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.firstname}</TableCell>
                     <TableCell>{row.lastname}</TableCell>
-                    <TableCell>{Sum(row.Grade)}</TableCell>
-                    <TableCell>{row.Grade.length}</TableCell>
-                    <TableCell>{row.Grade.length ? (Sum(row.Grade) / row.Grade.length).toFixed(2) : 0}</TableCell>
+                    <TableCell>{Sum(row.practiceGradesList)}</TableCell>
+                    <TableCell>{row.practiceGradesList.length}</TableCell>
+                    <TableCell>{row.practiceGradesList.length ? (Sum(row.practiceGradesList) / row.practiceGradesList.length).toFixed(2) : 0}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

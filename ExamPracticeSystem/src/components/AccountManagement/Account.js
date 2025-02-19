@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { AppContext } from '../AppContext';
 import ForgetPassword from './forgetPassword'
+import HomePage from '../HomePage';
 
 //difine the user roles
 const user_roles = [
@@ -28,7 +29,7 @@ const style = {
 
 function Account() {
   // Context for user account 
-  const { userAccount, username, setUsername } = useContext(AppContext);
+  const { userAccount, username, setUsername, setfuncts } = useContext(AppContext);
  // the state of the modules
   const [open, setOpen] = useState(false);
   //set for log in
@@ -118,6 +119,7 @@ function Account() {
       localStorage.removeItem('loginrole');
       localStorage.removeItem('loginid');
       setShowConfirmation("");
+      setfuncts(<HomePage/>)
     }
   };
 

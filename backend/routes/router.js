@@ -11,6 +11,17 @@ router.post('/deletePracticeQuestion', userController.deletePracticeQuestion);
 router.post('/savePracticeQusetion', userController.savePracticeQusetion);
 router.post('/excelPracticeUpdate', userController.excelPracticeUpdate);
 router.post('/updatePracticeResult', userController.updatePracticeResult);
+router.get('/getExamBank', userController.getExamBank);
+router.post('/deleteExamQuestion', userController.deleteExamQuestion);
+router.post('/saveExamQusetion', userController.saveExamQusetion);
+router.post('/excelExamUpdate', userController.excelExamUpdate);
+router.post('/updateExamResult', userController.updateExamResult);
 
+router.get('/getExamModes', userController.getExamModes);
+router.post('/updateExamMode', userController.updateExamMode);
+router.post('/getExamPaperQuestion', userController.getExamPaperQuestion);
+router.post('/deleteUserGrades', userController.deleteUserGrades);
+router.post('/viewUserDetailResult', userController.viewUserDetailResult);
+router.get('/deleteAllUserGrades', userController.deleteAllUserGrades);
 
 module.exports = router;

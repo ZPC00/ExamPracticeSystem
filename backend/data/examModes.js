@@ -1,0 +1,3 @@
+let examModes = {"examAvailable":"false","examName":"Daily Tests","examStartTime":"2024-12-01 00:00:00","examEndTime":"2025-05-31T04:00:00.000Z","examTime":60,"examSingleChoiceCount":3,"examSingleChoiceScore":6,"examMultipleChoiceCount":3,"examMultipleChoiceScore":12,"examFillingBlankCount":3,"examFillingBlankScore":10,"examJudgementsCount":2,"examJudgementsScore":8,"examStudentGradesVisible":true,"examStudentAnswerVisible":true}
+  
+  module.exports = examModes;

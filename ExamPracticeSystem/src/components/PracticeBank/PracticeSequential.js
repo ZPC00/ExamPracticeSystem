@@ -80,7 +80,7 @@ function PracticeSequential() {
 
   return practiceHomepage ? (
     <div>
-        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to Practice Sequential Quiz</h1>
+        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to the Sequential Practice Quiz</h1>
         <h2 style={{ textAlign: "left", marginTop: "60px" }}>Please choose the question type you need to practice:</h2>
          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "200px", marginBottom: "150px", alignItems: "center" }}>
 

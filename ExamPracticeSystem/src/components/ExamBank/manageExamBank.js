@@ -1,12 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, 
   Tooltip, Alert, TextField, Button, Dialog, DialogActions, DialogContent, 
   DialogTitle, Autocomplete 
 } from '@mui/material';
-import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon, ReportProblem as ReportProblemIcon,AddCircleOutline as AddCircleOutlineIcon} from '@mui/icons-material';
+import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon, ReportProblem as ReportProblemIcon, AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
-import { AppContext } from '../AppContext';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 
@@ -23,9 +22,7 @@ Title.propTypes = {
   children: PropTypes.node,
 };
 
-function ManagePracticeBank() {
-  // Context to get and set practice questions
-  const { practiceBank, setPracticeBank } = useContext(AppContext);
+function ManageExamBank() {
   
   // success or error alert
   const [outSuccess, setOutSuccess] = useState(null);
@@ -33,14 +30,22 @@ function ManagePracticeBank() {
 
   // confirmation module
   const [showConfirmation, setShowConfirmation] = useState("");
+  const [examBank,setExamBank]=useState([]);
+
+  //load the exam question from back end service
+    useEffect(() => {
+      axios.get('/getExamBank')
+        .then(response => {
+         setExamBank(response.data);
+    })
+        .catch(error => {
+        console.error('Error fetching product data:', error);});
+    }, []);
   
-
-
-
   // Filter questions based on search term
   const [searchTerm, setSearchTerm] = useState("");
   
-  const filteredQuestion = practiceBank.filter(
+  const filteredQuestion = examBank.filter(
     (question) =>
       (question.Question && question.Question.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (question.type && question.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -79,9 +84,9 @@ function ManagePracticeBank() {
     } else {
       // delete and send backend to update
       axios
-        .post('/deletePracticeQuestion', { id })
+        .post('/deleteExamQuestion', { id })
         .then((response) => {
-          setPracticeBank(response.data.updatedPracticeQuestion);
+          setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
           setTimeout(() => {
             setOutSuccess("");
@@ -125,9 +130,9 @@ function ManagePracticeBank() {
 
       // send backend to update
       axios
-        .post("/savePracticeQusetion", updatedInfo)
+        .post("/saveExamQusetion", updatedInfo)
         .then((response) => {
-          setPracticeBank(response.data.updatedPracticeQuestion);
+          setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
           setTimeout(() => {
             setOutSuccess("");
@@ -144,9 +149,9 @@ function ManagePracticeBank() {
     else {
       // send backend to update
       axios
-        .post("/savePracticeQusetion", updatedInfo )
+        .post("/saveExamQusetion", updatedInfo )
         .then((response) => {
-          setPracticeBank(response.data.updatedPracticeQuestion);
+          setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
           setTimeout(() => {
             setOutSuccess("");
@@ -195,9 +200,9 @@ function ManagePracticeBank() {
 
       // send to backend to update
       axios
-        .post("/excelPracticeUpdate", excelUpdateData)
+        .post("/excelExamUpdate", excelUpdateData)
         .then((response) => {
-          setPracticeBank(response.data.updatedPracticeQuestion);
+          setExamBank(response.data.updatedExamQuestion);
           alert(`${response.data.message} Please review the correctness of these questions!`);
         })
         .catch((error) => {
@@ -247,7 +252,7 @@ function ManagePracticeBank() {
               Add Question
             </Button>
             <h1 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
-              Practice Questions Management
+              Exam Questions Management
             </h1>
             <TextField
               label="Filter Questions"
@@ -528,4 +533,4 @@ function ManagePracticeBank() {
   );
 }
 
-export default ManagePracticeBank;
+export default ManageExamBank;

@@ -70,7 +70,7 @@ function PracticeMockExam() {
     }
 
     return () => clearInterval(countdown); // Clean up on unmount or timer change
-                  // eslint-disable-next-line 
+    // eslint-disable-next-line 
   }, [practiceHomepage, timer]);
 
   // the function for handle submit each user's question
@@ -98,6 +98,7 @@ function PracticeMockExam() {
   // the function to deal jump to target quesstion
   const handleJumpToQuestion = (index) => {
     setCurrentIndex(index);
+    setShowSubmitBottun(false)
 
     // dispaly the result if has answered the question
     if (attempts[index]) {
@@ -128,7 +129,7 @@ const handleSubmitExam = () => {
   if (attempts[currentIndex].userAnswer !== userAnswer) {
     handleSubmitUserAnswer(currentQuestion.type);
   }
-
+  console.log(attempts)
   // Calculate Practice Score and Incorrect Questions List
   const PracticeScore = attempts.filter((a) => a.correctness).length;
   const IncorrectQIDList = attempts.filter((a) => !a.correctness).map((a) => a.qID);
@@ -150,7 +151,7 @@ const handleSubmitExam = () => {
         setPracticeBank(response.data.updatedPracticeQuestion);
       }, 0);
       console.log(response.data.message);
-      setfuncts(<ExamPracticeResult attempts={attempts} PracticeScore={PracticeScore} />);
+      setfuncts(<ExamPracticeResult attempts={attempts} PracticeScore={PracticeScore}/>);
     })
     .catch((error) => {
       console.error("UpdateError", error);
@@ -189,7 +190,7 @@ const handleSubmitExam = () => {
   return practiceHomepage ? (
     <div>
 
-        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "30px" }}>Welcome to Mock Exam!</h1>
+        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "30px" }}>Welcome to the Mock Exam</h1>
         <h2 style={{ textAlign: "left", marginTop: "60px" }}>Please input initialization data for the mock exams:</h2>
 
         <div style={{  textAlign: "left", marginTop: "100px", display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
@@ -218,9 +219,10 @@ const handleSubmitExam = () => {
           label="Single Choice Counts"
           type="number"
           value={practiceSingleCounts}
-          onChange={(e) => setPracticeSingleCounts(e.target.value)}
-          error={practiceSingleCounts < 0 || practiceSingleCounts > singleChoiceBank.length}
-          helperText={practiceSingleCounts < 0 || practiceSingleCounts > singleChoiceBank.length ? `Enter a number between 0 and ${singleChoiceBank.length}`:""}
+          onChange={(e) => {
+            const newValue = e.target.value
+            if (newValue>=0 && newValue<=singleChoiceBank.length){
+              setPracticeSingleCounts(newValue)}}}
           inputProp={{ min: 0, max: singleChoiceBank.length }}
           slotProps={{
             inputLabel: {
@@ -238,10 +240,11 @@ const handleSubmitExam = () => {
           label="Multiple Choice Counts"
           type="number"
           value={practiceMultipleCounts}
-          onChange={(e) => setPracticeMultipleCounts(e.target.value)}
-          error={practiceMultipleCounts < 0 || practiceMultipleCounts > multipleChoiceBank.length}
-          helperText={practiceMultipleCounts < 0 || practiceMultipleCounts > multipleChoiceBank.length ? `Enter a number between 0 and ${multipleChoiceBank.length}`:""}
-          inputProp={{ min: 0, max: multipleChoiceBank.length }}
+          onChange={(e) => {
+            const newValue = e.target.value
+            if (newValue>=0 && newValue<=multipleChoiceBank.length){
+            setPracticeMultipleCounts(newValue)}}}
+         inputProp={{ min: 0, max: multipleChoiceBank.length }}
           slotProps={{
             inputLabel: {
               shrink: true,
@@ -258,9 +261,10 @@ const handleSubmitExam = () => {
           label="Filling Blank Counts"
           type="number"
           value={practiceFillingCounts}
-          onChange={(e) => setPracticeFillingCounts(e.target.value)}
-          error={practiceFillingCounts < 0 || practiceFillingCounts > fillingBlankBank.length}
-          helperText={practiceFillingCounts < 0 || practiceFillingCounts > fillingBlankBank.length ? `Enter a number between 0 and ${fillingBlankBank.length}`:""}
+          onChange={(e) => {
+            const newValue = e.target.value
+            if (newValue>=0 && newValue<=fillingBlankBank.length){ 
+            setPracticeFillingCounts(newValue)}}}
           inputProp={{ min: 0, max: fillingBlankBank.length }}
           slotProps={{
             inputLabel: {
@@ -278,9 +282,10 @@ const handleSubmitExam = () => {
           label="Judgements Counts"
           type="number"
           value={practiceJudgementsCounts}
-          onChange={(e) => setPracticeJudgementsCounts(e.target.value)}
-          error={practiceJudgementsCounts < 0 || practiceJudgementsCounts > judgementsBank.length}
-          helperText={practiceJudgementsCounts < 0 || practiceJudgementsCounts > judgementsBank.length ? `Enter a number between 0 and ${judgementsBank.length}`:""}
+          onChange={(e) => {
+            const newValue = e.target.value
+            if (newValue>=0 && newValue<=judgementsBank.length){ 
+            setPracticeJudgementsCounts(newValue)}}}
           inputProp={{ min: 0, max: judgementsBank.length }}
           slotProps={{
             inputLabel: {
@@ -312,7 +317,7 @@ const handleSubmitExam = () => {
     //  Page for practice process
     <div>
       {/* Timer Display */}
-      <Typography variant="h6" style={{ marginTop: "20px", textAlign: "left" }}>
+      <Typography variant="h5" bold style={{ marginTop: "20px", textAlign: "left", color: timer > practiceTime*6 ? "black":"red",fontWeight: "bold"}}>
         Time Left: {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
       </Typography>
 

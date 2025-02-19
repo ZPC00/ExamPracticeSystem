@@ -3,7 +3,7 @@ import { AppContext } from "../AppContext";
 import {Button, Checkbox, TextField, FormControlLabel, Radio, RadioGroup, Typography, Stack} from "@mui/material";
 import _ from "lodash"
 
-function PracticeDisorder() {
+function PracticeUnorder() {
 
   const { practiceBank } = useContext(AppContext);
 
@@ -94,7 +94,7 @@ function PracticeDisorder() {
   return practiceHomepage ? (
     //  Homepage for filter the type of questions.
     <div>
-        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to Practice Disordered Quiz</h1>
+        <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to the Unordered Practice Quiz</h1>
         <h2 style={{ textAlign: "left", marginTop: "60px" }}>Please choose the question type you need to practice:</h2>
          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "200px", marginBottom: "150px", alignItems: "center" }}>
          <Button variant="contained" style={{ width: "200px" }} onClick={() => handleSelectQuestionType(null)}>
@@ -263,4 +263,4 @@ function PracticeDisorder() {
   );
 }
 
-export default PracticeDisorder;
+export default PracticeUnorder;

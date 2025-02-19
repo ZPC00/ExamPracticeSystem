@@ -1,15 +1,25 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Home as HomeIcon, People as PeopleIcon, DnsRounded as DnsRoundedIcon, Settings as SettingsIcon, Timer as TimerIcon } from '@mui/icons-material';
+import { Explicit as ExplicitIcon, Home as HomeIcon, People as PeopleIcon, Settings as SettingsIcon, Quiz as QuizIcon, ViewList as ViewListIcon,
+         ViewQuilt as ViewQuiltIcon, Grading as GradingIcon, PlaylistAddCheckCircle as PlaylistAddCheckCircleIcon,
+         PlaylistAdd as PlaylistAddIcon, PermContactCalendar as PermContactCalendarIcon, PlaylistAddCircle as PlaylistAddCircleIcon
+} from '@mui/icons-material';
+
 import { AppContext } from './AppContext';
 import DisplayAccountInfo from './AccountManagement/displayAccountInfo';
 import AccountMangement from './AccountManagement/accountMangement'
 import ManagePracticeBank from './PracticeBank/managePracticeBank'
 import PracticeGrades from './GradesView/PracticeGrades';
 import PracticeSequential from './PracticeBank/PracticeSequential'
-import PracticeDisorder from './PracticeBank/PracticeDisorder'
+import PracticeUnorder from './PracticeBank/PracticeUnorder'
 import PracticeMockExam from './PracticeBank/PracticeMockExam';
+import ManageExamBank from './ExamBank/manageExamBank'
+import ExamManagement from './ExamBank/examManagement';
+import Exam from './ExamBank/Exam'
+import ExamGrades from './GradesView/ExamGrades';
+
+
 
 
 const iconColor = 'rgba(255, 255, 255, 0.7)';
@@ -19,26 +29,32 @@ const categories = [
   {
     id: 'Student',
     children: [
-      { id: 'Sequential Quiz', icon: <PeopleIcon sx={{ color: iconColor }} /> , activeModule:<PracticeSequential/>},
-      { id: 'Disordered Quiz', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> , activeModule:<PracticeDisorder/>},
-      { id: 'Mock Exam', icon: <DnsRoundedIcon sx={{ color: iconColor }} /> , activeModule:<PracticeMockExam/>}
+      { id: 'Sequential Practice', icon: <ViewListIcon sx={{ color: iconColor }} /> , activeModule:<PracticeSequential/>},
+      { id: 'Unordered Practice', icon: <ViewQuiltIcon sx={{ color: iconColor }} /> , activeModule:<PracticeUnorder/>},
+      { id: 'Mock Exam', icon: <QuizIcon sx={{ color: iconColor }} /> , activeModule:<PracticeMockExam/>},
+      { id: 'Exam', icon: <ExplicitIcon sx={{ color: iconColor }} /> , activeModule:<Exam/>}
     ],
   },
   {
     id: 'Teacher',
     children: [
-      { id: 'Pratice Bank Management', icon: <SettingsIcon sx={{ color: iconColor }} />, activeModule:<ManagePracticeBank/> },
-      { id: 'View Practice Grades', icon: <TimerIcon sx={{ color: iconColor }} /> , activeModule:<PracticeGrades/>},
+      { id: 'Pratice Bank Management', icon: <PlaylistAddCircleIcon sx={{ color: iconColor }} />, activeModule:<ManagePracticeBank/> },
+      { id: 'Exam Bank Management', icon: <PlaylistAddIcon sx={{ color: iconColor }} />, activeModule:<ManageExamBank/> },
+      { id: 'View Practice Grades', icon: <PlaylistAddCheckCircleIcon sx={{ color: iconColor }} /> , activeModule:<PracticeGrades/>},
+      { id: 'View Exam Grades', icon: <GradingIcon sx={{ color: iconColor }} /> , activeModule:<ExamGrades/>},
+      { id: 'Exam Settings', icon: <SettingsIcon sx={{ color: iconColor }} />, activeModule:<ExamManagement/> },
     ],
   },
   {
     id: 'Management',
     children: [
-      { id: 'Account Information', icon: <SettingsIcon sx={{ color: iconColor }} />, activeModule: <DisplayAccountInfo/> },
-      { id: 'Account Management', icon: <TimerIcon sx={{ color: iconColor }} />,activeModule: <AccountMangement/>  },
+      { id: 'Account Information', icon: <PermContactCalendarIcon sx={{ color: iconColor }} />, activeModule: <DisplayAccountInfo/> },
+      { id: 'Account Management', icon: <PeopleIcon sx={{ color: iconColor }} />,activeModule: <AccountMangement/>  },
     ],
   },
 ];
+
+
 
 const item = {
   px: 3,
@@ -58,7 +74,7 @@ export default function Navigator(props) {
   const { ...other } = props;
   
   // Context for user account and functs
-  const { username, userAccount, setfuncts,functs } = useContext(AppContext);
+  const { username, userAccount, setfuncts,functs, examRuningState, setExamRuningState } = useContext(AppContext);
 
   // current user role
   const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
@@ -83,8 +99,15 @@ export default function Navigator(props) {
 
   // function to change the display module
   const handleModuleClick = async (module) => {
+    if (examRuningState) {
+      const confirmExit = window.confirm("The exam is processing, changing the page will stop the exam and result in a score of 0. Are you sure?");
+      if (!confirmExit) {
+        return;
+      }else{
+        setExamRuningState(false)
+      }
+    }
     if (functs===module){
-     
      setfuncts("")  
      setTimeout(() => setfuncts(module), 0);
   } else
@@ -115,7 +138,7 @@ export default function Navigator(props) {
           <ListItemIcon>
             <HomeIcon sx={{ color: iconColor }} />
           </ListItemIcon>
-          <ListItemText>Quiz Overview</ListItemText>
+          <ListItemText>System Overview</ListItemText>
         </ListItem>
 
         {/* Categories */}

@@ -137,21 +137,21 @@ function DisplayAccountInfo() {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Sum Scores:</h4>
             <Typography>
-              {Sum(currentUserInfo.Grade)}
+              {Sum(currentUserInfo.practiceGradesList)}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Counts:</h4>
             <Typography>
-              {currentUserInfo.Grade.length}
+              {currentUserInfo.practiceGradesList.length}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Average Scores:</h4>
             <Typography>
-              {currentUserInfo.Grade.length? (Sum(currentUserInfo.Grade)/currentUserInfo.Grade.length).toFixed(2):0}
+              {currentUserInfo.practiceGradesList.length? (Sum(currentUserInfo.practiceGradesList)/currentUserInfo.practiceGradesList.length).toFixed(2):0}
             </Typography>
           </div>
           <br />
