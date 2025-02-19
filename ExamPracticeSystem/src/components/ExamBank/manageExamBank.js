@@ -319,6 +319,7 @@ function ManageExamBank() {
                         />
                       </Tooltip>
 
+                      {/*question format error and alert.*/}
                       {(() => {
                           let problemReport = "";
                           if (row.type === "Single Choice") {
@@ -383,8 +384,9 @@ function ManageExamBank() {
         <DialogTitle style={{ minWidth: '1000px' }}>{selectedQuestion ? "Edit Question" : "Add New Question"}</DialogTitle>
         <DialogContent>
 
-          {/* only edit display and can't be modified*/}
-          {selectedQuestion&&(<TextField
+          {/* only edit display and can't be modified for the id*/}
+          {selectedQuestion&&(
+          <TextField
             label="Question ID"
             value={updatedInfo.id || ''}
             style={{ marginTop: '20px' }}
@@ -401,6 +403,7 @@ function ManageExamBank() {
             fullWidth
             renderInput={(params) => <TextField {...params} label="Type" />}
           />
+
           <TextField
             label="Question Title"
             value={updatedInfo.Question || ''}
@@ -408,9 +411,10 @@ function ManageExamBank() {
             style={{ marginTop: '20px' }}
             fullWidth
           />
+
           {/* only display which the type of quesiton is choice*/}
           {(updatedInfo.type === 'Single Choice' || updatedInfo.type === 'Multiple Choice')&&(
-          <div>
+        <div>
           <TextField
             label="A"
             value={updatedInfo.A || ''}
@@ -446,8 +450,8 @@ function ManageExamBank() {
             style={{ marginTop: '20px' }}
             fullWidth
           />
-          </div>
-          )}
+        </div>
+        )}
 
           {/* only display which the type of quesiton is single choice*/}
           {(updatedInfo.type === 'Single Choice')&&(
@@ -467,6 +471,7 @@ function ManageExamBank() {
                 label="Correct Answerer"
                 value={updatedInfo.correctAnswer || ''}
                 onChange={(e) => {
+                  // format rule check
                   const newValue = e.target.value.toUpperCase(); // Ensure it's uppercase
                   // Check if input contains only A, B, C, D, E (any combination)
                   const isValid = /^[ABCDE]+$/.test(newValue); // Regular expression to allow only ABCDE, at least 1 character

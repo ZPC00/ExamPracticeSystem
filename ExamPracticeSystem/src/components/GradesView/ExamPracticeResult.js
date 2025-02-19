@@ -15,6 +15,7 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
   const endIndex = startIndex + itemsPerPage;
   const paginatedRows = attempts.slice(startIndex, endIndex);
 
+  // the function to change the page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -30,8 +31,7 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
           justifyContent: "space-between",
           alignItems: "center",
           padding: "10px",
-        }}
-      >
+        }}>
         <h3 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
           Total Score: {attempts.length}
         </h3>
@@ -39,10 +39,11 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
           Your Grade: {PracticeScore}
         </h3>
         <h3 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
-          Correct Percent: {attempts.length > 0 ? ((PracticeScore / attempts.length) * 100).toFixed(2) + "%" : "0%"}
+          Correct Percent: {attempts.length > 0 ? ((PracticeScore / attempts.length) * 100).toFixed(2) + "%" : "0%"}     {/*caculate the correct percent*/}
         </h3>
       </div>
       <br/>
+
       {/* Table */}
       <Table size="large">
         <TableHead>
@@ -64,8 +65,8 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
             return (
               <TableRow key={index} style={{ cursor: 'pointer' }}>
                 <TableCell>{(page - 1) * itemsPerPage + index + 1}</TableCell>
-                <TableCell>{question.Question || "N/A"}</TableCell>
-                <TableCell>{question.type || "N/A"}</TableCell>
+                <TableCell>{question.Question || ""}</TableCell>
+                <TableCell>{question.type || ""}</TableCell>
                 <TableCell>
                   {["Single Choice", "Multiple Choice"].includes(question.type)
                     ? question.correctAnswer.split("").map(option => question[option]).join(", ") // Display detailed answer choices
@@ -80,7 +81,7 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
                   {row.correctness ? (<CheckIcon style={{ color: "green" }} />) : (<ClearIcon style={{ color: "red" }}/>)}
                 </TableCell>
 
-                <TableCell>{row.correctness? "1":"0"}</TableCell>
+                <TableCell>{row.correctness? "1":"0"}</TableCell>    {/*each question 1 point*/}
               </TableRow>
             );
           })}

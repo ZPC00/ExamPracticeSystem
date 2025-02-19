@@ -50,7 +50,7 @@ function ExamGrades() {
   const [outSuccess, setOutSuccess] = useState(null);
   const [openUserResult,setOpenUserResult] = useState(false);
 
-
+    // set for displaying the users' answer if the user has taken the exam
   const [examPaperQuestions, setExamPaperQuestions] = useState(null);
   const [attempts,setAttempts] = useState(null);
   const [examScore, setExamScore] = useState(null);
@@ -95,7 +95,8 @@ function ExamGrades() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  
+  // the function to delete users' grade
   const handleDeleteGrades = (userName)=>{
     if (!showConfirmation) {
       setShowConfirmation("Click it again to delete");
@@ -118,6 +119,7 @@ function ExamGrades() {
     }
   };
 
+  // the function to view the detailed users' answers
   const handleViewUserResult = (userName)=>{
       axios
         .post('/viewUserDetailResult', { userName })
@@ -151,6 +153,7 @@ function ExamGrades() {
       XLSX.writeFile(wb, "User_Exam_Grades.xlsx");
     };
 
+    // clear all users' grades
     const clearAllGrades = () => {
       const confirmExit = window.confirm("All the users' grades will be cleered and can't roll back. Are you sure?");
       if (!confirmExit) {
@@ -180,6 +183,7 @@ function ExamGrades() {
         </Alert>
       )}
 
+      {/* Title */}
       <div style={{ display: 'flex', maxHeight: '100%', minWidth: '40%' }}>
         <div style={{ flex: 2, color: '#1976D2', marginLeft: '30px' }}>
           <br />
@@ -191,18 +195,18 @@ function ExamGrades() {
               padding: "10px",
             }}
           >
-            <h1 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
-              User Exam Grades
-            </h1>
-            <TextField
+          <h1 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
+            User Exam Grades
+          </h1>
+          <TextField
               label="Filter Users"
               variant="standard"
               margin="normal"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ marginLeft: "auto" }}
-            />
-          </div>
+          />
+        </div>
     
       {/* download Button */}
       <div style={{display: "flex",justifyContent: "space-between",alignItems: "center",padding: "10px"}}>
@@ -214,8 +218,8 @@ function ExamGrades() {
         </Button>
       </div>
           
-          {/* Table for displaying user exam grades */}
-          {paginatedRows.length > 0 ? (
+      {/* Table for displaying user exam grades */}
+      {paginatedRows.length > 0 ? (
             <Table size="large">
               <TableHead>
                 <TableRow>
@@ -223,35 +227,34 @@ function ExamGrades() {
                     <TableSortLabel
                       active={sortBy === "id"}
                       direction={sortBy === "id" ? sortDirection : "asc"}
-                      onClick={() => handleSort("id")}
-                    >
+                      onClick={() => handleSort("id")}>
                       User ID
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "name"}
                       direction={sortBy === "name" ? sortDirection : "asc"}
-                      onClick={() => handleSort("name")}
-                    >
+                      onClick={() => handleSort("name")}>
                       User Name
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "firstname"}
                       direction={sortBy === "firstname" ? sortDirection : "asc"}
-                      onClick={() => handleSort("firstname")}
-                    >
+                      onClick={() => handleSort("firstname")}>
                       First Name
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "lastname"}
                       direction={sortBy === "lastname" ? sortDirection : "asc"}
-                      onClick={() => handleSort("lastname")}
-                    >
+                      onClick={() => handleSort("lastname")}>
                       Last Name
                     </TableSortLabel>
                   </TableCell>
@@ -260,17 +263,18 @@ function ExamGrades() {
                     <TableSortLabel
                       active={sortBy === "average"}
                       direction={sortBy === "average" ? sortDirection : "asc"}
-                      onClick={() => handleSort("average")}
-                    >
+                      onClick={() => handleSort("average")}>
                       Exam Score
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>Action</TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedRows.map((row) => (
-                  <TableRow key={row.id} style={{ cursor: 'pointer' }}>
+            </TableHead>
+
+            <TableBody>
+              {paginatedRows.map((row) => (
+                <TableRow key={row.id} style={{ cursor: 'pointer' }}>
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.firstname}</TableCell>
@@ -279,17 +283,16 @@ function ExamGrades() {
                       {row.examGradesList.length > 0 ? (Sum(row.examGradesList) / row.examGradesList.length).toFixed(2) : "No Record"}
                     </TableCell>
                     <TableCell>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Tooltip
                         title={
-                          showConfirmation ? "Click it again to delete the grades" : "Double click to delete its grade"
-                        }
-                      >
+                          showConfirmation ? "Click it again to delete the grades" : "Double click to delete its grade"}>
                         <DeleteIcon
                           onClick={() => handleDeleteGrades(row.name)}
-                          size="small"
-                        />
+                          size="small"/>
                       </Tooltip>
+
+                      {/* only display if the user has taken the exam and the answer has been submitted*/}
                       {(row.examAttemptList.length > 0 )&&
                       (
                       <Tooltip title="View exam answers">
@@ -298,14 +301,14 @@ function ExamGrades() {
                           style={{ marginLeft: '10px' }}
                         />
                       </Tooltip>)}
-                      </div>
-                    </TableCell>                    
-
-                  </TableRow>
+                    </div>
+                </TableCell>                    
+              </TableRow>
                 ))}
               </TableBody>
             </Table>
           ) : (
+              // situation of no user in dataset
             <div>
               <br /> <br /> <br />
               <div style={{ fontSize: '1.2em' }}>No Users available.</div>
@@ -315,6 +318,7 @@ function ExamGrades() {
         </div>
       </div>
 
+      {/*View detailed exam Dialog*/}
       <Dialog open={openUserResult} onClose={() => setOpenUserResult(false)} maxWidth="lg" fullWidth>
           <DialogContent sx={{ minWidth: "1000px", p:4}}>
           <ExamResult examStudentGradesVisible={true} examStudentAnswerVisible={true} 

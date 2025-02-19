@@ -10,6 +10,7 @@ function PracticeMockExam() {
 
   const { practiceBank, setPracticeBank, setUserAccount,username,setfuncts } = useContext(AppContext);
 
+  // filter different types of questions for the mock exam
   const singleChoiceBank = _.shuffle(practiceBank.filter(q => q.type === "Single Choice"))
   const multipleChoiceBank = _.shuffle(practiceBank.filter(q => q.type === "Multiple Choice"))
   const fillingBlankBank = _.shuffle(practiceBank.filter(q => q.type === "Filling Blank"))

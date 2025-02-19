@@ -18,12 +18,12 @@ function Exam() {
   const [examModes, setExamModes] = useState({});
   const [submitted, setSubmitted] = useState(false);               // set for the prevent not to submit twice
 
-  // state for the process of test
+  // state for the process of exam
   const [userAnswer, setUserAnswer] = useState("");
   const [showSubmitBottun, setShowSubmitBottun] = useState(false);
-  const [attempts, setAttempts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timer, setTimer] = useState(examModes.examTime * 60); // Timer in seconds
+  const [attempts, setAttempts] = useState([]);                // store relative inoformation of the users' answer
   const currentQuestion = examPaperQuestions[currentIndex];
 
   // set for view the detailed of the exam result if the user have taken the exam.
@@ -33,20 +33,13 @@ function Exam() {
   
   // set for the home page of the exam page and view the Exam Description
   const currentUser = userAccount.find(user => user.name === username);
-  const totalScore = (examModes.examSingleChoiceCount*examModes.examSingleChoiceScore+
+  const totalScore = (examModes.examSingleChoiceCount*examModes.examSingleChoiceScore+                // caculate total score
     examModes.examMultipleChoiceCount*examModes.examMultipleChoiceScore+examModes.examFillingBlankCount*examModes.examFillingBlankScore+examModes.examJudgementsCount*examModes.examJudgementsScore)
-
+  
+  // Set exam timer to avoid the impact of asynchronous excution
   useEffect(() => {
     setTimer(examModes.examTime * 60); // Update timer based on exam Time (in minutes)
   }, [examModes.examTime]);
-
-    // listen for currentIndex changes, randomize the order of options
-  useEffect(() => {
-      if (currentQuestion && (currentQuestion.type === "Single Choice" || currentQuestion.type === "Multiple Choice")) {
-        const randomOptionList = _.shuffle(["A", "B", "C", "D", "E"]); // randomize the order of options
-        setRandomOptions(randomOptionList);
-      }                          
-  }, [currentIndex, currentQuestion]); // listen for current index, current qustion changes
 
   // Timer logic
   useEffect(() => {
@@ -69,8 +62,15 @@ function Exam() {
     // eslint-disable-next-line 
   }, [examRuningState, timer]);
 
+    // listen for currentIndex changes, randomize the order of options
+    useEffect(() => {
+      if (currentQuestion && (currentQuestion.type === "Single Choice" || currentQuestion.type === "Multiple Choice")) {
+        const randomOptionList = _.shuffle(["A", "B", "C", "D", "E"]); // randomize the order of options
+        setRandomOptions(randomOptionList);
+      }                          
+  }, [currentIndex, currentQuestion]); // listen for current index, current qustion changes
 
-    //load the exam mode from back end
+  // load the exam mode from back end
   useEffect(() => {
     axios.get('/getExamModes')
         .then(response => {
@@ -79,11 +79,19 @@ function Exam() {
         .catch(error => {
           console.error('Error fetching product data:', error);
       });
-  }, []);  
+  // get the newest exam grade and answers from backend.
+    axios.get('/userAccount')
+        .then(response => {
+          setUserAccount(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching product data:', error);
+          });
+  }, [setUserAccount]);
 
+  // check exam time available and control the aviliable of the start time button
   const [examTimeInRange, setIsExamTimeInRange] = useState(false);
 
-  // check exam time available
   useEffect(() => {
     const checkTimeRange = () => {
       const currentTime = new Date();
@@ -95,6 +103,7 @@ function Exam() {
     checkTimeRange();
     return () => clearInterval(interval);
   }, [examModes.examStartTime, examModes.examEndTime]);
+
 
   // the function for handle submit each user's question
   const handleSubmitUserAnswer = (QuestionType) => {
@@ -123,7 +132,6 @@ function Exam() {
       currentQuestionScore = examModes.examJudgementsScore
     }
 
-    
     //store the user's answer to review
     setAttempts(prev => {
       const updatedAttempts = [...prev];
@@ -159,7 +167,7 @@ function Exam() {
   
 // the function to submit the exam
 const handleSubmitExam = () => {
-  if (submitted) return; // 防止重复提交
+  if (submitted) return; // check submitted to avoid submitting twice
     setSubmitted(true);
 
   // Ensure the current user's answer is stored if it's different
@@ -178,7 +186,7 @@ const handleSubmitExam = () => {
     userAttempt:attempts
   };
 
-  // Send the exam result to the server
+  // Send the exam result to the back end.
   axios
     .post("/updateExamResult", newExamResultInfo)
     .then((response) => {
@@ -186,7 +194,6 @@ const handleSubmitExam = () => {
       setUserAccount(response.data.updateUserAccount);
       setfuncts(<ExamResult examStudentGradesVisible={examModes.examStudentGradesVisible} examStudentAnswerVisible={examModes.examStudentAnswerVisible} 
         examPaperQuestions={examPaperQuestions} attempts={attempts} examScore={examScore} totalScore={totalScore}/>)
-      
     })
     .catch((error) => {
       console.error("UpdateError", error);
@@ -214,6 +221,7 @@ const handleSubmitExam = () => {
       });
 }};
 
+// the function to view the detailed users' answers if the user have taken the exam.
 const handleViewUserResult = (userName)=>{
   axios
     .post('/viewUserDetailResult', { userName })
@@ -229,27 +237,29 @@ const handleViewUserResult = (userName)=>{
     });
   }
 
-        
-
   return examModes.examAvailable ?
   // check exam aviabiable?
   (currentUser.examGradesList.length !== 0 ? (
-  // the user have taken the exam to display the grades
+    
+  // Situation 1： the user have taken the exam to display the grades
   <div>
     <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "30px"}}>Welcome to Exam System</h1>
     <h2 style={{ textAlign: "left", marginTop: "60px",  marginLeft:"20px"  }}>Here is the current exam notice:</h2>
+
     <div style={{  textAlign: "left", marginTop: "50px", display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
       <h3>Exam Name:</h3>
       <h3 style={{ marginLeft: "20px" }}>
          {examModes.examName}
       </h3>
     </div>
+
     <div style={{  textAlign: "left", display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
       <h3>Examination Validity Time:</h3>
       <h3 style={{ marginLeft: "20px" }}>
         {new Date(examModes.examStartTime).toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}   ~     {new Date(examModes.examEndTime).toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}
       </h3>
     </div>
+
     <div style={{  textAlign: "left",  display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
     <h3>Exam Time:</h3>
     <h3 style={{marginLeft:"20px"}}>{examModes.examTime} min</h3>
@@ -265,7 +275,9 @@ const handleViewUserResult = (userName)=>{
       </h3> 
     </div>
     
-    <Button underline style={{marginTop: "100px", marginBottom: "100px", color: "#1976D2", fontSize: "2rem",fontWeight: "bold",textDecoration: "underline"}} onClick={() => handleViewUserResult(username)}>
+    {/*submit button to view the detailed of the exam result*/}
+    <Button underline style={{marginTop: "100px", marginBottom: "100px", color: "#1976D2", fontSize: "2rem",fontWeight: "bold",textDecoration: "underline"}} 
+    onClick={() => {if(currentUser.examAttemptList.length>0){handleViewUserResult(currentUser.name)}else{alert("There is no answers records, you may have suspended during the exam.")}}}>  {/*Check the users' answer list*/}
       You have taken the exam and the result has been submitted.
     </Button>
 
@@ -282,6 +294,7 @@ const handleViewUserResult = (userName)=>{
   </div>
   ) : (
   !examRuningState ? 
+// Situation 2： the user doesn't take the exam
 // dispaly the exam description  
  (<div>
     <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "30px"}}>Welcome to the Exam System</h1>
@@ -293,12 +306,14 @@ const handleViewUserResult = (userName)=>{
          {examModes.examName}
       </h3>
     </div>
+
     <div style={{  textAlign: "left", display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
       <h3>Examination Validity Time:</h3>
       <h3 style={{ marginLeft: "20px" }}>
         {new Date(examModes.examStartTime).toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}   ~     {new Date(examModes.examEndTime).toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}
       </h3>
     </div>
+
     <div style={{  textAlign: "left",  display: 'flex', alignItems: 'center', marginLeft:"20px" }}>
     <h3>Exam Time:</h3>
     <h3 style={{marginLeft:"20px"}}>{examModes.examTime} min</h3>
@@ -319,21 +334,22 @@ const handleViewUserResult = (userName)=>{
       </h3> 
     </div>
     
+    {/*start the exam button：it will disabled if the current time didn't in the examination validity time*/}
     <Button variant="contained" style={{ width: "160px", marginTop: "50px", marginBottom: "90px"}} onClick={() => startExam()} disabled={!examTimeInRange}>
      {examTimeInRange? "Start Exam":"Time Not Available"} 
     </Button>
   </div>)
   :(
-  // change to take exam
+
+  // change to take exam page
   <div>
-      {/* Timer Display */}
+      {/* Timer Display: the color will turn red if the rest of time is less than 10% of total time */}
       <Typography variant="h5" bold style={{ marginTop: "20px", textAlign: "left", color: timer > examModes.examTime*6 ? "black":"red",fontWeight: "bold"}}>
         Time Left: {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
       </Typography>
 
-  
+    {/*the part of displaying question */}
     <div style={{ display: "flex", gap: "20px", padding: "20px", height: "800px" }}>
-      {/* question part */}
       <div style={{ flex: 1 }}>
         <Typography variant="h6" gutterBottom>
           {currentIndex + 1}. {currentQuestion.Question}
@@ -348,20 +364,19 @@ const handleViewUserResult = (userName)=>{
               }
             }
           >
-            {/*display the optional choice squentially*/}
+            {/*display the optional choice squentially which control by useEffect*/}
             {randomOptions.map(
               (option) =>
                 currentQuestion[option] && (
                   <FormControlLabel key={option} value={option} control={<Radio />} label={`${currentQuestion[option]}`} />
-                )
-            )}
+                ))}
           </RadioGroup>
         )}
 
         {/* Multiple Choice */}
         {currentQuestion.type === "Multiple Choice" && (
           <Stack spacing={1}>
-            {/*display the optional choice squentially*/}
+            {/*display the optional choice squentially which control by useEffect*/}
             {randomOptions.map(
               (option) =>
                 currentQuestion[option] && (
@@ -411,7 +426,7 @@ const handleViewUserResult = (userName)=>{
           </RadioGroup>
         )}
 
-        {/* only no answered question display submit button*/}
+        {/* next button, only click the next for the last question to display submit button*/}
         <Button variant="outlined" color="secondary" onClick={() => {
             if (showSubmitBottun) {
               if (window.confirm("Submission can't be rolled back, are you sure?")) {
@@ -421,7 +436,7 @@ const handleViewUserResult = (userName)=>{
               handleNext();                                                              // Call next if not submitting
             }
             }} style={{ marginTop: "10px", marginLeft: "10px" }}>
-            {showSubmitBottun? "Submit" : "Next"}
+            {showSubmitBottun? "Submit" : "Save And Next"}
         </Button>
       </div>
 
@@ -449,11 +464,11 @@ const handleViewUserResult = (userName)=>{
     </div>
   </div>
 ))) : (
-  // the exam is not aviable
+  
+  // Situation 3：the exam is not pubilc
  <div>
   <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "30px"}}>Welcome to Exam System</h1>
   <h2 style={{ textAlign: "left", marginTop: "60px",  marginLeft:"20px"  }}>Here is the exam notice:</h2>
-
 
   <h3 style={{  textAlign: "center", marginTop: "200px", marginBottom:"400px" }}>The exam is not available now. Please wait for it to be public.</h3>
  </div>)}

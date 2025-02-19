@@ -384,8 +384,7 @@ function ManagePracticeBank() {
             value={updatedInfo.id || ''}
             style={{ marginTop: '20px' }}
             fullWidth
-            InputProps={{ readOnly: true }}
-          />)}
+            InputProps={{ readOnly: true }}/>)}
 
           <Autocomplete
             disablePortal
@@ -394,15 +393,15 @@ function ManagePracticeBank() {
             onChange={(event, newValue) => setUpdatedInfo({ ...updatedInfo, type: newValue })}
             style={{ marginTop: '20px' }}
             fullWidth
-            renderInput={(params) => <TextField {...params} label="Type" />}
-          />
+            renderInput={(params) => <TextField {...params} label="Type" />}/>
+
           <TextField
             label="Question Title"
             value={updatedInfo.Question || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, Question: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
+
           {/* only display which the type of quesiton is choice*/}
           {(updatedInfo.type === 'Single Choice' || updatedInfo.type === 'Multiple Choice')&&(
           <div>
@@ -411,36 +410,35 @@ function ManagePracticeBank() {
             value={updatedInfo.A || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, A: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
+
           <TextField
             label="B"
             value={updatedInfo.B || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, B: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
+
           <TextField
             label="C"
             value={updatedInfo.C || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, C: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
+
           <TextField
             label="D"
             value={updatedInfo.D || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, D: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
+
           <TextField
             label="E"
             value={updatedInfo.E || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, E: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          />
+            fullWidth/>
           </div>
           )}
 
@@ -473,8 +471,8 @@ function ManagePracticeBank() {
                   }
                 }}
                 style={{ marginTop: '20px' }}
-                fullWidth
-              />
+                fullWidth/>
+
             )
           }
 
@@ -485,8 +483,8 @@ function ManagePracticeBank() {
             value={updatedInfo.correctAnswer || ''}
             onChange={(e) => setUpdatedInfo({ ...updatedInfo, correctAnswer: e.target.value })}
             style={{ marginTop: '20px' }}
-            fullWidth
-          /> )}
+            fullWidth/> 
+          )}
 
           {/* only display which the type of quesiton is Judgements*/}
           {(updatedInfo.type === 'Judgements')&&(
@@ -497,8 +495,8 @@ function ManagePracticeBank() {
             onChange={(event, newValue) => setUpdatedInfo({ ...updatedInfo, correctAnswer: newValue })}
             style={{ marginTop: '20px' }}
             fullWidth
-            renderInput={(params) => <TextField {...params} label="Correct Answerer" />}
-          />)}
+            renderInput={(params) => <TextField {...params} label="Correct Answerer" />}/>
+          )}
 
           <TextField
           label="Description"
@@ -506,8 +504,7 @@ function ManagePracticeBank() {
           multiline
           onChange={(e) => setUpdatedInfo({ ...updatedInfo, description: e.target.value })}
           style={{ marginTop: '20px' }}
-          fullWidth
-        />
+          fullWidth/>
           
           {/* error allert to notice the users*/}
           {error && (

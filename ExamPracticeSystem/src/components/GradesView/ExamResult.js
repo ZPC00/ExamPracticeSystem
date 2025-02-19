@@ -15,7 +15,8 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  
+  // Situation1: Display alert if the exam set Grades Visible is false
   if (!examStudentGradesVisible) {
     return (
       <div style={{ display: "flex", flexDirection: "column", height: "950px", minWidth: "40%" }}>
@@ -30,6 +31,7 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
   }
 
   return (
+    // Situation 2: Display grade Statistics if the exam set Grades Visible is true
     <div style={{ display: "flex", flexDirection: "column", height: "950px", minWidth: "40%" }}>
       <h1 style={{ textAlign: "center", color: "#1976D2", margin: 0 }}>Result of the exam</h1>
       <br />
@@ -43,6 +45,7 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
         </h3>
       </div>
 
+      {/* Situation 3: Display all answers if the exam set answers Visible is true */}
       {examStudentAnswerVisible && (
         <div>
           <br />
@@ -61,6 +64,7 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
             </TableHead>
             <TableBody>
               {paginatedRows.map((row, index) => {
+                
                 // Find question from exam paper
                 const question = examPaperQuestions.find((q) => q.id === row.qID);
 
