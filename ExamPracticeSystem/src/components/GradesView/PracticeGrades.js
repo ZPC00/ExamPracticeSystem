@@ -91,8 +91,7 @@ function PracticeGrades() {
               justifyContent: "space-between",
               alignItems: "center",
               padding: "10px",
-            }}
-          >
+            }}>
             <h1 style={{ flexGrow: 1, textAlign: "center", margin: 0 }}>
               User Practice Exam Grades
             </h1>
@@ -102,8 +101,7 @@ function PracticeGrades() {
               margin="normal"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ marginLeft: "auto" }}
-            />
+              style={{ marginLeft: "auto" }}/>
           </div>
           
           {/* Table for displaying user practice grades */}
@@ -115,67 +113,68 @@ function PracticeGrades() {
                     <TableSortLabel
                       active={sortBy === "id"}
                       direction={sortBy === "id" ? sortDirection : "asc"}
-                      onClick={() => handleSort("id")}
-                    >
+                      onClick={() => handleSort("id")}>
                       User ID
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "name"}
                       direction={sortBy === "name" ? sortDirection : "asc"}
-                      onClick={() => handleSort("name")}
-                    >
+                      onClick={() => handleSort("name")}>
                       User Name
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "firstname"}
                       direction={sortBy === "firstname" ? sortDirection : "asc"}
-                      onClick={() => handleSort("firstname")}
-                    >
+                      onClick={() => handleSort("firstname")}>
                       First Name
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "lastname"}
                       direction={sortBy === "lastname" ? sortDirection : "asc"}
-                      onClick={() => handleSort("lastname")}
-                    >
+                      onClick={() => handleSort("lastname")}>
                       Last Name
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "sum"}
                       direction={sortBy === "sum" ? sortDirection : "asc"}
-                      onClick={() => handleSort("sum")}
-                    >
+                      onClick={() => handleSort("sum")}>
                       Practice Sum Scores
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "count"}
                       direction={sortBy === "count" ? sortDirection : "asc"}
-                      onClick={() => handleSort("count")}
-                    >
+                      onClick={() => handleSort("count")}>
                       Practice Counts
                     </TableSortLabel>
                   </TableCell>
+
                   <TableCell>
                     <TableSortLabel
                       active={sortBy === "average"}
                       direction={sortBy === "average" ? sortDirection : "asc"}
-                      onClick={() => handleSort("average")}
-                    >
+                      onClick={() => handleSort("average")} >
                       Practice Average Scores
                     </TableSortLabel>
                   </TableCell>
+
                 </TableRow>
               </TableHead>
+              
               <TableBody>
                 {paginatedRows.map((row) => (
                   <TableRow key={row.id} style={{ cursor: 'pointer' }}>

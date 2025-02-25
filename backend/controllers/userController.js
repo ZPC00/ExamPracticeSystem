@@ -483,7 +483,7 @@ exports.getExamPaperQuestion = (req, res) => {
 
   return res.status(200).json({
     message: `The exam question has been post`,
-    examPaperQuestions : shuffledQuestions
+    examPaperQuestions : shuffledQuestions,
   });}
 
     // update Exam mock exam Result

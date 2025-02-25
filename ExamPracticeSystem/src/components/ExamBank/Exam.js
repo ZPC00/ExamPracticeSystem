@@ -79,15 +79,7 @@ function Exam() {
         .catch(error => {
           console.error('Error fetching product data:', error);
       });
-  // get the newest exam grade and answers from backend.
-    axios.get('/userAccount')
-        .then(response => {
-          setUserAccount(response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching product data:', error);
-          });
-  }, [setUserAccount]);
+  }, []);
 
   // check exam time available and control the aviliable of the start time button
   const [examTimeInRange, setIsExamTimeInRange] = useState(false);
@@ -277,7 +269,7 @@ const handleViewUserResult = (userName)=>{
     
     {/*submit button to view the detailed of the exam result*/}
     <Button underline style={{marginTop: "100px", marginBottom: "100px", color: "#1976D2", fontSize: "2rem",fontWeight: "bold",textDecoration: "underline"}} 
-    onClick={() => {if(currentUser.examAttemptList.length>0){handleViewUserResult(currentUser.name)}else{alert("There is no answers records, you may have suspended during the exam.")}}}>  {/*Check the users' answer list*/}
+    onClick={() => {if(currentUser.examAttemptList.length>0){handleViewUserResult(currentUser.name)}else{alert("There is no answers records, you may have suspended the exam during the process of the exam.")}}}>  {/*Check the users' answer list*/}
       You have taken the exam and the result has been submitted.
     </Button>
 
