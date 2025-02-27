@@ -20,8 +20,6 @@ import Exam from './ExamBank/Exam'
 import ExamGrades from './GradesView/ExamGrades';
 
 
-
-
 const iconColor = 'rgba(255, 255, 255, 0.7)';
 
 // categories list

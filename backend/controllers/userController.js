@@ -286,7 +286,7 @@ exports.excelPracticeUpdate = async (req, res) => {
  // Update Practice Mock Exam Result to dataset (after mock exam)
 exports.updatePracticeResult = async (req, res) => {
   const { loginUsername, practiceScore, IncorrectQList } = req.body;
-  console.log("Received request body:", req.body);
+
   try {
     // Find the user by username
     const selectedUser = await UserAccount.findOne({ name: loginUsername });
