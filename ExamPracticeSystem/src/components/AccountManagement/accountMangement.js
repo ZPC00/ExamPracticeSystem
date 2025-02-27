@@ -67,7 +67,7 @@ function AccountMangement() {
       }, 2000);
     } else {
       axios
-        .post('/deleteUser', { userName })
+        .post("/deleteUser", { userName })
         .then((response) => {
           setUserAccount(response.data.updatedUserAccount);
           setOutSuccess(response.data.message);
@@ -123,6 +123,7 @@ function AccountMangement() {
       axios
         .post("/saveUser", updatedInfo)
         .then((response) => {
+          console.log(response)
           setUserAccount(response.data.updatedUserAccount);
           setOutSuccess(response.data.message);
           setTimeout(() => {
@@ -140,6 +141,7 @@ function AccountMangement() {
       axios
         .post("/saveUser", updatedInfo )
         .then((response) => {
+          console.log(response)
           setUserAccount(response.data.updatedUserAccount);
           setOutSuccess(response.data.message);
           setTimeout(() => {

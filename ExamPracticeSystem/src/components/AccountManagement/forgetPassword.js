@@ -14,7 +14,7 @@ function ForgetPassword() {
   const [forgetPassword1, setForgetPassword1] = useState("");
   const [forgetPassword2, setForgetPassword2] = useState("");
   const [resetCode, setResetCode] = useState("");
-  const [updatePasswordInfo, setUpdatePasswordInfo] = useState({});    // Object storing user information for password update
+  const [matchUserId, setMatchUserId] = useState("");  
 
   // State to store the randomly generated reset code
   const [randomNo, setRandomNo] = useState("");
@@ -58,7 +58,7 @@ function ForgetPassword() {
     if (matchedUser) {
 
       // Store the user's ID for later password update
-      setUpdatePasswordInfo({...updatePasswordInfo, id: matchedUser.id })
+      setMatchUserId(matchedUser.id)
 
       // Clear input fields
       setForgetPassword1("");
@@ -93,15 +93,19 @@ function ForgetPassword() {
       return;
     }
   
-    setUpdatePasswordInfo({
-      id: updatePasswordInfo.id,
+    if (!matchUserId) {
+      setError("User ID not found.");
+      return;
+    }
+  
+    const passwordData = {
+      id: matchUserId,
       newPassword1: forgetPassword1,
       newPassword2: forgetPassword2,
-    });
-  
-    // send to back end to update and use await in async to make sure send the complete data
+    };
+    
     try {
-      const response = await axios.post("/updatePassword", updatePasswordInfo);
+      const response = await axios.post("/updatePassword", passwordData);
       setUserAccount(response.data.updatedUserAccount);
       setSuccessMessage("Password reset successful!");
       setTimeout(() => {
@@ -110,10 +114,11 @@ function ForgetPassword() {
       }, 3000);
     } catch (error) {
       console.error("Error resetting password:", error);
+      setError("Password reset failed. Please try again.");
     }
   };
   
-
+  
   return (
     <div>
       {/* Button to open the forget password dialog */}

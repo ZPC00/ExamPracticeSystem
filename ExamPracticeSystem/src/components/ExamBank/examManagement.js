@@ -29,12 +29,13 @@ function ExamManagement() {
         setExamSingleChoiceBankLengh(response.data.examSingleChoiceBankLengh);
         setExamMultipleChoiceBankLengh(response.data.examMultipleChoiceBankLengh);
         setExamFillingBlankBankLengh(response.data.examFillingBlankBankLengh);
-        setExamJudgementsBankLengh(response.data.examJudgementsBankLengh)
+        setExamJudgementsBankLengh(response.data.examJudgementsBankLengh);
       })
       .catch(error => {
         console.error('Error fetching exam modes:', error);
       });
   };
+  
 
   // get the exam modes.
   useEffect(() => {
@@ -71,7 +72,7 @@ function ExamManagement() {
     })
     .catch((error) => {
      console.error("Error updating exam mode:", error);
-      setError("Failed to update exam settings. Please try again.");
+     setError("Failed to update exam settings. Please try again.");
   });}
 
   return (

@@ -1,6 +1,7 @@
 const express = require('express');
-const cors = require('cors');
 const mongoose = require("mongoose");
+const cors = require('cors');
+
 const bodyParser = require('body-parser');
 const router = require('./routes/router.js');
 
@@ -22,8 +23,21 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use('/', router);
 
+//connect to server db
 const port = 3030;
-const server = app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+const startServer = async () => {
+  try {
+    await mongoose.connect("mongodb://127.0.0.1:27017/practiceExamSystem");
+    console.log(" MongoDB connect success！");
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error(" server failed:", error);
+  }
+};
+
+startServer()
+
+
 

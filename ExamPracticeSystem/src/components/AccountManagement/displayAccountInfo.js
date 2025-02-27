@@ -22,9 +22,10 @@ function DisplayAccountInfo() {
   const [error, setError] = useState('');
   
   // Function to handle saving updated password
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     // Set user ID in updatePasswordInfo
-    setUpdatePasswordInfo({ ...updatePasswordInfo, id: currentUserInfo.id })
+    setUpdatePasswordInfo(prev => ({ ...prev, id: currentUserInfo.id }));
+
     // Validate required fields
     if (!updatePasswordInfo.oldPassword || !updatePasswordInfo.newPassword1 || !updatePasswordInfo.newPassword2) {
       setError("All fields are required.");
@@ -57,9 +58,16 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
-    // send user information to back end to update
-    axios
-      .post("/updatePassword", updatePasswordInfo )
+    // add user id to match
+    const passwordData = {
+      id: currentUserInfo.id, // ad
+      oldPassword: updatePasswordInfo.oldPassword,
+      newPassword1: updatePasswordInfo.newPassword1,
+      newPassword2: updatePasswordInfo.newPassword2,
+    };
+
+    await axios
+      .post("/updatePassword", passwordData )
       .then((response) => {
         setUserAccount(response.data.updatedUserAccount);
         setOutSuccess(response.data.message);          
@@ -73,6 +81,7 @@ function DisplayAccountInfo() {
         console.error("Error adding user:", error);
     });
   };
+  
   // Function to sum user grades
   const Sum = (grades) => {
     return grades.reduce((acc, grade) => acc + grade, 0);

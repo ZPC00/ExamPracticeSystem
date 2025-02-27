@@ -32,6 +32,7 @@ function ExamGrades() {
   const filteredUsers = userAccount.filter(
     (user) =>
     ( user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.Loginrole.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastname.toLowerCase().includes(searchTerm.toLowerCase()))
   );

@@ -1,68 +1,88 @@
 const _ = require('lodash');
-let userAccount = require('../data/userAccount');
-let practiceBank = require('../data/practiceBank');
-let examBank = require('../data/examBank');
-let examModes = require('../data/examModes');
+const UserAccount = require("../models/UserAccount");
+const PracticeBank = require("../models/PracticeBank");
+const ExamBank = require("../models/ExamBank");
+const ExamModes = require("../models/ExamModes");
 
-// ----------------  account management module  -------------------------
+// -------------------------------  account management module  --------------------------------------
 
 // get all user account list
-exports.getUserAccounts = (req, res) => {
-  res.json(userAccount);
-};
-
-// delete user account
-exports.deleteUser = (req, res) => {
-  const { userName } = req.body;
-  
-  // check user exists
-  const userExists = userAccount.some(user => user.name === userName);
-  if (!userExists) {
-    return res.status(404).json({ error: `User "${userName}" not found.` });
+exports.getUserAccounts = async (req, res) => {
+  try {
+      const users = await UserAccount.find(); // get all the user account from mongodb
+      res.json(users);
+  } catch (error) {
+      console.error("get all user failed:", error);
+      res.status(500).json({ message: "server error" });
   }
-  // delete the account if user exists and response
-  userAccount = userAccount.filter(user => user.name !== userName);
-  res.status(200).json({
-    message: `User "${userName}" has been deleted successfully.`,
-    updatedUserAccount: userAccount,
-  });
 };
 
-// User account maintenance
-exports.saveUser = (req, res) => {
-  let { id, name, password, Loginrole, firstname, lastname, email } = req.body;
+// handle delete user account
+exports.deleteUser = async (req, res) => {
+    const { userName } = req.body;
+    try {
+        // check user exists
+        const user = await UserAccount.findOne({ name : userName });
+        if (!user) {
+            return res.status(404).json({ error: `User "${userName}" not found.` });
+        }
 
-  if (id) {
-    // update user if user id exsit
-    const selectedUser = userAccount.find(user => user.id === id);
+        // delete the account if user exists and response
+        await UserAccount.deleteOne({ name: userName });
 
-    if (!selectedUser) {
-      return res.status(404).json({ error: `User with ID "${id}" not found.` });
+        // get the updatted all users
+        const updatedUserAccount = await UserAccount.find();
+
+        res.status(200).json({
+            message: `User "${userName}" has been deleted successfully.`,
+            updatedUserAccount,
+        });
+    } catch (error) {
+        console.error("delete account failed:", error);
+        res.status(500).json({ message: "server error" });
     }
-    
-    // update the change value
-    Object.assign(selectedUser, {
-      name,
-      firstname,
-      lastname,
-      password,
-      Loginrole,
-      email,
-    });
+};
 
-    return res.status(200).json({
-      message: `User "${name}" has been updated successfully.`,
-      updatedUserAccount: userAccount,
-    });
+// handle User account maintenance (modify,add)
+exports.saveUser = async (req, res) => {
+  let { id, name, password, Loginrole, firstname, lastname, email } = req.body;
+  try {
+    if (id) {
+        // Find user by ID
+        const selectedUser = await UserAccount.findOne({ id: id });
 
-    // add user if user id not exsit
+        if (!selectedUser) {
+            return res.status(404).json({ error: `User with ID "${id}" not found.` });
+        }
+
+        // Update user fields
+        selectedUser.name = name;
+        selectedUser.firstname = firstname;
+        selectedUser.lastname = lastname;
+        selectedUser.password = password;
+        selectedUser.Loginrole = Loginrole;
+        selectedUser.email = email;
+
+        // Save updated user
+        await selectedUser.save();
+        const updatedUserAccount = await UserAccount.find();
+
+        return res.status(200).json({
+            message: `User "${name}" has been updated successfully.`,
+            updatedUserAccount,
+        });
+
+  // add user if user id not exsit
   } else {
     // generate a new id
-    const maxId = Math.max(...userAccount.map(user => parseInt(user.id, 10)), 0);
-    const newId = (maxId + 1).toString().padStart(8, '0');
+    const lastUser = await UserAccount.findOne().sort({ id: -1 }).limit(1);
+    let newId = "00000001";                // default id is 1
+    if (lastUser && lastUser.id) {
+      newId = (parseInt(lastUser.id, 10) + 1).toString().padStart(8, '0');
+    }
 
     // pack new user data
-    const newUser = {
+    let newUser = new UserAccount({
       id: newId,
       name,
       firstname,
@@ -72,99 +92,124 @@ exports.saveUser = (req, res) => {
       email,
       practiceGradesList: [],
       examGradesList: [],
-    };
-    // push to update the user
-    userAccount.push(newUser);
+    });
+
+    // save to the dataset
+    await newUser.save();
+    const updatedUserAccount = await UserAccount.find();
+
     return res.status(201).json({
       message: `User "${name}" added successfully.`,
-      updatedUserAccount: userAccount,
+      updatedUserAccount,
     });
-  }
-};
+  }}catch (error) {
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });}};
 
-//update the users' password
 
-exports.updatePassword = (req, res) => {
+// handle update the users' password (change/forget the password)
+exports.updatePassword = async (req, res) => {
   let { id, oldPassword, newPassword1, newPassword2} = req.body;
 
-    const selectedUser = userAccount.find(user => user.id === id);
-
+  try {
+    const selectedUser = await UserAccount.findOne({id:id});
+    
     if (!selectedUser) {
       return res.status(404).json({ error: `User with ID "${id}" not found.` });
     }
 
     // update the user's password
-    Object.assign(selectedUser, {
-      password: newPassword1
-    });
+    selectedUser.password = newPassword1;
+    await selectedUser.save();           // save to the dataset
+    const updatedUserAccount = await UserAccount.find();
 
     return res.status(200).json({
       message: `Password has been updated successfully.`,
-      updatedUserAccount: userAccount,
+      updatedUserAccount,
     });
-};
+}catch (error) {
+  return res.status(500).json({ error: `Internal Server Error: ${error.message}` })}};
 
-// ----------------  practice bank module  -------------------------
 
-// get practice bank list
-exports.getPracticeBank = (req, res) => {
-  res.json(practiceBank);
-};
+// ------------------------------------------  practice bank module  -----------------------------------------------
 
-// delete question
-exports.deletePracticeQuestion = (req, res) => {
-  const { id } = req.body;
-
-  const practiceQuestionExsit = practiceBank.some(practiceQ => practiceQ.id === id);
-  if (!practiceQuestionExsit) {
-    return res.status(404).json({ error: `Question id="${id}" not found.` });
+// get practice questions bank list
+exports.getPracticeBank = async (req, res) => {
+  try {
+      const questions = await PracticeBank.find(); // get all practice questions from mongodb
+      res.json(questions);
+  } catch (error) {
+      console.error("get all practice questions failed:", error);
+      res.status(500).json({ message: "server error" });
   }
-  // delete the question if the question exsit
-  practiceBank = practiceBank.filter(practiceQ => practiceQ.id !== id);
-  res.status(200).json({
-    message: `The Practice Question which id="${id}" has been deleted successfully.`,
-    updatedPracticeQuestion: practiceBank,
-  });
 };
 
-// practice bank question maintenance
-exports.savePracticeQusetion = (req, res) => {
+// handle delete single question
+exports.deletePracticeQuestion = async (req, res) => {
+  const { id } = req.body;
+  try {
+  // check user exists
+      const selectedQuestion = await PracticeBank.findOne({ id : id });
+      if (!selectedQuestion) {
+      return res.status(404).json({ error: `The selected question "${id}" not found.` });
+        }
+      // delete the account if user exists and response
+      await PracticeBank.deleteOne({ id: id });
+
+      const updatedPracticeQuestion = await PracticeBank.find()
+
+      res.status(200).json({
+          message: `Question with "${id}" has been deleted successfully.`,
+          updatedPracticeQuestion,
+      });
+    } catch (error) {
+      console.error("delete question failed:", error);
+      res.status(500).json({ message: "server error" });
+  }
+};
+
+// handle practice bank question maintenance (modify or add the questions)
+exports.savePracticeQusetion = async (req, res) => {
   let { id, type, Question, A, B, C, D, E, correctAnswer,description } = req.body;
+  try {
+    if (id) {
+        // Find question by ID
+        const selectedQuestion = await PracticeBank.findOne({ id: id });
 
-  // update Question if the id exsit
-  if (id) {
-    const selectedQuestion = practiceBank.find(q => q.id === id);
+        if (!selectedQuestion) {
+            return res.status(404).json({ error: `Question with ID "${id}" not found.` });
+        }
 
-    if (!selectedQuestion) {
-      return res.status(404).json({ error: `Question with ID "${id}" not found.` });
+        // Update questions fields
+        selectedQuestion.type = type;
+        selectedQuestion.Question = Question;
+        selectedQuestion.A = A;
+        selectedQuestion.B = B;
+        selectedQuestion.C = C;
+        selectedQuestion.D = D;
+        selectedQuestion.E = E;
+        selectedQuestion.correctAnswer = correctAnswer;
+        selectedQuestion.description = description;
+
+        // Save updated questions
+        await selectedQuestion.save();
+        const updatedPracticeQuestion = await PracticeBank.find();
+
+        return res.status(200).json({
+            message: `Question with "${id}" has been updated successfully.`,
+            updatedPracticeQuestion,
+        });
+
+  // add question if question id not exsit
+  } else {
+    // generate a new id
+    const lastQuestion = await PracticeBank.findOne().sort({ id: -1 }).limit(1);
+    let newId = "00000001";                // default id is 1
+    if (lastQuestion && lastQuestion.id) {
+      newId = (parseInt(lastQuestion.id, 10) + 1).toString().padStart(8, '0');
     }
 
-    // update the quesiton information
-    Object.assign(selectedQuestion, {
-      type,
-      Question,
-      A,
-      B,
-      C,
-      D,
-      E,
-      correctAnswer,
-      description
-    });
-
-    return res.status(200).json({
-      message: `Question with id="${id}" has been updated successfully.`,
-      updatedPracticeQuestion: practiceBank,
-    });
-
-    // add question if the id is not exsit
-  } else {
-    // gernerate new quesiton id
-    const maxId = Math.max(...practiceBank.map(question => parseInt(question.id, 10)), 0);
-    const newId = (maxId + 1).toString().padStart(8, '0');
-
-    // pack question date to add the questions
-    const newQuestion = {
+    // pack new question data
+    let newQuestion = new PracticeBank({
       id: newId,
       type,
       Question,
@@ -175,179 +220,188 @@ exports.savePracticeQusetion = (req, res) => {
       E,
       correctAnswer,
       description,
-      inCorrectCount: 0,
-    };
-    practiceBank.push(newQuestion);
-    return res.status(201).json({
-      message: `Question with id="${newId}" added successfully.`,
-      updatedPracticeQuestion: practiceBank,
+      inCorrectCount:0,
     });
-  }
-};
+
+    // save to the dataset
+    await newQuestion.save();
+    const updatedPracticeQuestion = await PracticeBank.find();
+
+    return res.status(201).json({
+      message: `Question with "${newId}" added successfully.`,
+      updatedPracticeQuestion,
+    });
+  }}catch (error) {
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
+}};
 
 // add the question by uploading the excel
-exports.excelPracticeUpdate = (req, res) => {
+exports.excelPracticeUpdate = async (req, res) => {
   const updateQ = req.body;
 
-  // find out max id
-  let currentMaxId = Math.max(...practiceBank.map(question => parseInt(question.id, 10)), 0);
+  try {
+    // Find max ID
+    const lastQuestion = await PracticeBank.findOne().sort({ id: -1 }).limit(1);
+    let newId = lastQuestion && lastQuestion.id ? parseInt(lastQuestion.id, 10) + 1 : 1;
 
-  const newQuestions = updateQ.map(question => {
-    currentMaxId++;                                          // define id add 1 each time
-    const newId = currentMaxId.toString().padStart(8, '0'); // gernerate the new id for each question
-    
-    // pack each add question to add questions to practice bank
-    const { type, Question, A, B, C, D, E, correctAnswer, description } = question;
-    return {
-      id: newId,
-      type,
-      Question,
-      A,
-      B,
-      C,
-      D,
-      E,
-      correctAnswer,
-      description,
-      inCorrectCount: 0,
-    };
-  });
+    // Store new questions
+    const newQuestions = [];
 
-  // push each question to practiceBank
-  practiceBank.push(...newQuestions);
+    for (const question of updateQ) {
+      const formattedId = newId.toString().padStart(8, '0'); // Generate the new ID
+      newId++; // Increment for next question
 
-  return res.status(201).json({
-    message: `Add ${updateQ.length} questions successfully.`,
-    updatedPracticeQuestion: practiceBank,
-  });
-};
-
-
-  // update Practice mock exam Result
-  exports.updatePracticeResult = (req, res) => {
-    let { loginUsername, practiceScore, IncorrectQList } = req.body;
-
-    console.log("Received request body:", req.body);
-
-    const selectedUser = userAccount.find(user => user.name === loginUsername);
-    if (selectedUser) {
-      // Update the Grade information by adding the practiceScore
-      selectedUser.practiceGradesList.push(practiceScore);
-
-      // Iterate over IncorrectQList and update inCorrectCount
-      IncorrectQList.forEach(qID => {
-        practiceBank.forEach(q => {
-          if (q.id === qID) {
-            q.inCorrectCount += 1;
-          }
-        });
+      let newQuestion = new PracticeBank({
+        id: formattedId,
+        type: question.type,
+        Question: question.Question,
+        A: question.A,
+        B: question.B,
+        C: question.C,
+        D: question.D,
+        E: question.E,
+        correctAnswer: question.correctAnswer,
+        description: question.description,
+        inCorrectCount: 0,
       });
-      
-      return res.status(201).json({
-        message: "Practice result updated successfully",
-        updatedPracticeQuestion: practiceBank,
-        updatedUserAccount:userAccount
-      });
-    } else {
-      res.status(404).send("User not found");
-    }
-  };
 
-  // ----------------  exam bank module  -------------------------
-
-// get exam bank list
-exports.getExamBank = (req, res) => {
-  res.json(examBank);
-};
-
-// delete question
-exports.deleteExamQuestion = (req, res) => {
-  const { id } = req.body;
-
-  const examQuestionExsit = examBank.some(examQ => examQ.id === id);
-  if (!examQuestionExsit) {
-    return res.status(404).json({ error: `Question id="${id}" not found.` });
-  }
-  // delete the question if the question exsit
-  examBank = examBank.filter(examQ => examQ.id !== id);
-  res.status(200).json({
-    message: `The Exam Question which id="${id}" has been deleted successfully.`,
-    updatedExamQuestion: examBank,
-  });
-};
-
-// Exam bank question maintenance
-exports.saveExamQusetion = (req, res) => {
-  let { id, type, Question, A, B, C, D, E, correctAnswer,description } = req.body;
-
-  // update Question if the id exsit
-  if (id) {
-    const selectedQuestion = examBank.find(q => q.id === id);
-
-    if (!selectedQuestion) {
-      return res.status(404).json({ error: `Question with ID "${id}" not found.` });
+      await newQuestion.save(); // Save each question
+      newQuestions.push(newQuestion);
     }
 
-    // update the quesiton information
-    Object.assign(selectedQuestion, {
-      type,
-      Question,
-      A,
-      B,
-      C,
-      D,
-      E,
-      correctAnswer,
-      description
-    });
+    // Retrieve updated practice questions
+    const updatedPracticeQuestion = await PracticeBank.find();
 
-    return res.status(200).json({
-      message: `Question with id="${id}" has been updated successfully.`,
-      updatedExamQuestion: examBank,
-    });
-
-    // add question if the id is not exsit
-  } else {
-    // gernerate new quesiton id
-    const maxId = Math.max(...examBank.map(question => parseInt(question.id, 10)), 0);
-    const newId = (maxId + 1).toString().padStart(8, '0');
-
-    // pack question date to add the questions
-    const newQuestion = {
-      id: newId,
-      type,
-      Question,
-      A,
-      B,
-      C,
-      D,
-      E,
-      correctAnswer,
-      description,
-      inCorrectCount: 0,
-    };
-    examBank.push(newQuestion);
     return res.status(201).json({
-      message: `Question with id="${newId}" added successfully.`,
-      updatedExamQuestion: examBank,
+      message: `Added ${updateQ.length} questions successfully.`,
+      updatedPracticeQuestion,
     });
+
+  } catch (error) {
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
   }
 };
 
-// add the question by uploading the excel
-exports.excelExamUpdate = (req, res) => {
-  const updateQ = req.body;
 
-  // find out max id
-  let currentMaxId = Math.max(...examBank.map(question => parseInt(question.id, 10)), 0);
+ // Update Practice Mock Exam Result to dataset (after mock exam)
+exports.updatePracticeResult = async (req, res) => {
+  const { loginUsername, practiceScore, IncorrectQList } = req.body;
+  console.log("Received request body:", req.body);
+  try {
+    // Find the user by username
+    const selectedUser = await UserAccount.findOne({ name: loginUsername });
+    if (!selectedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-  const newQuestions = updateQ.map(question => {
-    currentMaxId++;                                          // define id add 1 each time
-    const newId = currentMaxId.toString().padStart(8, '0'); // gernerate the new id for each question
-    
-    // pack each add question to add questions to Exam bank
-    const { type, Question, A, B, C, D, E, correctAnswer, description } = question;
-    return {
+    // Add the practice score to the user's practiceGradesList
+    selectedUser.practiceGradesList.push(practiceScore);
+    await selectedUser.save();
+
+    // Update inCorrectCount for each question in IncorrectQList
+    await PracticeBank.updateMany(
+      { id: { $in: IncorrectQList } },
+      { $inc: { inCorrectCount: 1 } }
+    );
+
+    // Retrieve updated data
+    const updatedUserAccount = await UserAccount.find();
+    const updatedPracticeQuestion = await PracticeBank.find();
+
+    return res.status(201).json({
+      message: "Practice result updated successfully",
+      updatedPracticeQuestion,
+      updatedUserAccount,
+    });
+  } catch (error) {
+    console.error("Error updating practice result:", error);
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
+  }
+};
+
+
+// ---------------------------------  exam bank module  ----------------------------------
+
+// get exam question bank list
+exports.getExamBank = async (req, res) => {
+  try {
+      const questions = await ExamBank.find(); // get all the exam questions from mongodb
+      res.json(questions);
+  } catch (error) {
+      console.error("get all exam questions failed:", error);
+      res.status(500).json({ message: "server error" });
+  }
+};
+
+
+// handle delete single question 
+exports.deleteExamQuestion = async (req, res) => {
+  const { id } = req.body;
+  try {
+  // check user exists
+      const selectedQuestion = await ExamBank.findOne({ id : id });
+      if (!selectedQuestion) {
+      return res.status(404).json({ error: `The selected question "${id}" not found.` });
+        }
+      // delete the account if user exists and response
+      await ExamBank.deleteOne({ id: id });
+
+      const updatedExamQuestion = await ExamBank.find()
+
+      res.status(200).json({
+          message: `Question with "${id}" has been deleted successfully.`,
+          updatedExamQuestion,
+      });
+    } catch (error) {
+      console.error("delete question failed:", error);
+      res.status(500).json({ message: "server error" });
+  }
+};
+
+
+// Exam bank question maintenance (add/modify the questions)
+exports.saveExamQusetion = async (req, res) => {
+  let { id, type, Question, A, B, C, D, E, correctAnswer,description } = req.body;
+  try {
+    if (id) {
+        // Find question by ID
+        const selectedQuestion = await ExamBank.findOne({ id: id });
+
+        if (!selectedQuestion) {
+            return res.status(404).json({ error: `Question with ID "${id}" not found.` });
+        }
+
+        // Update questions fields
+        selectedQuestion.type = type;
+        selectedQuestion.Question = Question;
+        selectedQuestion.A = A;
+        selectedQuestion.B = B;
+        selectedQuestion.C = C;
+        selectedQuestion.D = D;
+        selectedQuestion.E = E;
+        selectedQuestion.correctAnswer = correctAnswer;
+        selectedQuestion.description = description;
+
+        // Save updated questions
+        await selectedQuestion.save();
+        const updatedExamQuestion = await ExamBank.find();
+
+        return res.status(200).json({
+            message: `Question with "${id}" has been updated successfully.`,
+            updatedExamQuestion,
+        });
+
+  // add question if question id not exsit
+  } else {
+    // generate a new id
+    const lastQuestion = await ExamBank.findOne().sort({ id: -1 }).limit(1);
+    let newId = "00000001";                // default id is 1
+    if (lastQuestion && lastQuestion.id) {
+      newId = (parseInt(lastQuestion.id, 10) + 1).toString().padStart(8, '0');
+    }
+
+    // pack new question data
+    let newQuestion = new ExamBank({
       id: newId,
       type,
       Question,
@@ -358,87 +412,136 @@ exports.excelExamUpdate = (req, res) => {
       E,
       correctAnswer,
       description,
-      inCorrectCount: 0,
-    };
-  });
+      inCorrectCount:0,
+    });
 
-  // push each question to examBank
-  examBank.push(...newQuestions);
+    // save to the dataset
+    await newQuestion.save();
+    const updatedExamQuestion = await ExamBank.find();
 
-  return res.status(201).json({
-    message: `Add ${updateQ.length} questions successfully.`,
-    updatedExamQuestion: examBank,
-  });
+    return res.status(201).json({
+      message: `Question with "${newId}" added successfully.`,
+      updatedExamQuestion,
+    });
+  }}catch (error) {
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
+}};
+
+
+// add the exam question by uploading the excel
+exports.excelExamUpdate = async (req, res) => {
+  const updateQ = req.body;
+
+  try {
+    // Find max ID
+    const lastQuestion = await ExamBank.findOne().sort({ id: -1 }).limit(1);
+    let newId = lastQuestion && lastQuestion.id ? parseInt(lastQuestion.id, 10) + 1 : 1;
+
+    // Store new questions
+    const newQuestions = [];
+
+    for (const question of updateQ) {
+      const formattedId = newId.toString().padStart(8, '0'); // Generate the new ID
+      newId++; // Increment for next question
+
+      let newQuestion = new ExamBank({
+        id: formattedId,
+        type: question.type,
+        Question: question.Question,
+        A: question.A,
+        B: question.B,
+        C: question.C,
+        D: question.D,
+        E: question.E,
+        correctAnswer: question.correctAnswer,
+        description: question.description,
+        inCorrectCount: 0,
+      });
+
+      await newQuestion.save(); // Save each question
+      newQuestions.push(newQuestion);
+    }
+
+    // Retrieve updated practice questions
+    const updatedExamQuestion = await ExamBank.find();
+
+    return res.status(201).json({
+      message: `Added ${updateQ.length} questions successfully.`,
+      updatedExamQuestion,
+    });
+
+  } catch (error) {
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
+  }
 };
 
+// update Exam Result (after exam)
+exports.updateExamResult = async (req, res) => {
+  let { loginUsername, examScore, IncorrectQList, userAttempt } = req.body;
+try{
+  const loginUser = await UserAccount.findOne({ name: loginUsername });
+  if (loginUser) {
+    // Update the Grade information by adding the examScore
+    loginUser.examGradesList[loginUser.examGradesList.length - 1] = examScore;
+    loginUser.examAttemptList.push(userAttempt)
+    await loginUser.save()
 
-  // update Exam mock exam Result
-  exports.updateExamResult = (req, res) => {
-    let { loginUsername, examScore, IncorrectQList } = req.body;
+    // Update inCorrectCount for each question in IncorrectQList
+    await ExamBank.updateMany(
+    { id: { $in: IncorrectQList } },
+    { $inc: { inCorrectCount: 1 } }
+  );
 
-    console.log("Received request body:", req.body);
+  const updateUserAccount = await UserAccount.find()
 
-    const selectedUser = userAccount.find(user => user.name === loginUsername);
-    if (selectedUser) {
-      // Update the Grade information by adding the examScore
-      selectedUser.practiceGradesList.push(examScore);
+    return res.status(201).json({
+      updateUserAccount,
+      message: "Exam result updated successfully",
+    });
+  } else {
+    res.status(404).send("User not found");}
+} catch (error) {
+    console.error("Error update Exam Result:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+}};
 
-      // Iterate over IncorrectQList and update inCorrectCount
-      IncorrectQList.forEach(qID => {
-        examBank.forEach(q => {
-          if (q.id === qID) {
-            q.inCorrectCount += 1;
-          }
-        });
-      });
-      
-      return res.status(201).json({
-        message: "Exam result updated successfully",
-        updatedExamQuestion: examBank,
-        updatedUserAccount:userAccount
-      });
-    } else {
-      res.status(404).send("User not found");
-    }
-  };
+// -------------------------------------  exam   module  ----------------------------------
 
 // get exam modes 
-exports.getExamModes = (req, res) => {
-  const examSingleChoiceBank = examBank.filter(q => q.type === "Single Choice");
-  const examMultipleChoiceBank = examBank.filter(q => q.type === "Multiple Choice");
-  const examFillingBlankBank = examBank.filter(q => q.type === "Filling Blank");
-  const examJudgementsBank = examBank.filter(q => q.type === "Judgements");
+exports.getExamModes = async (req, res) => {
+  try {
+    const examTypeCounts = await ExamBank.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
 
-  res.json({
-      examModesData: examModes,
-      examSingleChoiceBankLengh: examSingleChoiceBank.length,
-      examMultipleChoiceBankLengh: examMultipleChoiceBank.length,  
-      examFillingBlankBankLengh: examFillingBlankBank.length,  
-      examJudgementsBankLengh: examJudgementsBank.length  
-  });
+    const examModes = await ExamModes.find();
+    const examSingleChoiceBankCount = examTypeCounts.find(item => item._id === "Single Choice").count
+    const examMultipleChoiceBankCount = examTypeCounts.find(item => item._id === "Multiple Choice").count
+    const examFillingBlankBankCount = examTypeCounts.find(item => item._id === "Filling Blank").count
+    const examJudgementsBankCount = examTypeCounts.find(item => item._id === "Judgements").count
+
+    res.json({
+      examModesData: examModes[0],
+      examSingleChoiceBankLengh: examSingleChoiceBankCount,
+      examMultipleChoiceBankLengh: examMultipleChoiceBankCount,  
+      examFillingBlankBankLengh: examFillingBlankBankCount,  
+      examJudgementsBankLengh: examJudgementsBankCount
+    });
+  } catch (error) {
+    console.error('Error fetching exam modes:', error);
+    res.status(500).json({ error: 'Failed to fetch exam modes' });
+  }
 };
 
 
-
-// exam mode maintenance
-exports.updateExamMode = (req, res) => {
-  let { examAvailable,
-    examName,
-    examStartTime,
-    examEndTime,
-    examTime, 
-    examSingleChoiceCount,
-    examSingleChoiceScore,
-    examMultipleChoiceCount,
-    examMultipleChoiceScore,
-    examFillingBlankCount,
-    examFillingBlankScore,
-    examJudgementsCount,
-    examJudgementsScore,
-    examStudentGradesVisible,
-    examStudentAnswerVisible } = req.body;
-
-    Object.assign(examModes, {
+// exam mode maintenance (set the exam mode)
+exports.updateExamMode = async (req, res) => {
+  const {
     examAvailable,
     examName,
     examStartTime,
@@ -454,97 +557,136 @@ exports.updateExamMode = (req, res) => {
     examJudgementsScore,
     examStudentGradesVisible,
     examStudentAnswerVisible
-    });
+  } = req.body;
+
+  try {
+    let examMode = await ExamModes.findOne();
+
+    if (!examMode) {
+      return res.status(404).json({ message: "Exam mode not found" });
+    }
+
+    // Update the fields
+    examMode.examAvailable = examAvailable;
+    examMode.examName = examName;
+    examMode.examStartTime = examStartTime;
+    examMode.examEndTime = examEndTime;
+    examMode.examTime = examTime;
+    examMode.examSingleChoiceCount = examSingleChoiceCount;
+    examMode.examSingleChoiceScore = examSingleChoiceScore;
+    examMode.examMultipleChoiceCount = examMultipleChoiceCount;
+    examMode.examMultipleChoiceScore = examMultipleChoiceScore;
+    examMode.examFillingBlankCount = examFillingBlankCount;
+    examMode.examFillingBlankScore = examFillingBlankScore;
+    examMode.examJudgementsCount = examJudgementsCount;
+    examMode.examJudgementsScore = examJudgementsScore;
+    examMode.examStudentGradesVisible = examStudentGradesVisible;
+    examMode.examStudentAnswerVisible = examStudentAnswerVisible;
+
+    await examMode.save();
 
     return res.status(200).json({
-      message: `Exam Modes has been updated successfully.`,
-      updatedExamModes: examModes,
-    });};
-  
+      message: `Exam mode has been updated successfully.`,
+    });
 
-
-exports.getExamPaperQuestion = (req, res) => {
-  let { username } = req.body;
-  const loginUsername = userAccount.find(user => user.name === username);
-  loginUsername.examGradesList.push(0);
-
-  const singleChoiceBank = _.shuffle(examBank.filter(q => q.type === "Single Choice"))
-  const multipleChoiceBank = _.shuffle(examBank.filter(q => q.type === "Multiple Choice"))
-  const fillingBlankBank = _.shuffle(examBank.filter(q => q.type === "Filling Blank"))
-  const judgementsBank = _.shuffle(examBank.filter(q => q.type === "Judgements"))
-
-  const selectedQuestions = [
-    ...(examModes.examSingleChoiceCount > 0 ? singleChoiceBank.slice(0, examModes.examSingleChoiceCount) : []),
-    ...(examModes.examMultipleChoiceCount > 0 ? multipleChoiceBank.slice(0, examModes.examMultipleChoiceCount) : []),
-    ...(examModes.examFillingBlankCount > 0 ? fillingBlankBank.slice(0, examModes.examFillingBlankCount) : []),
-    ...(examModes.examJudgementsCount > 0 ? judgementsBank.slice(0, examModes.examJudgementsCount) : []),
-  ]
-  const shuffledQuestions = _.shuffle(selectedQuestions)
-
-  return res.status(200).json({
-    message: `The exam question has been post`,
-    examPaperQuestions : shuffledQuestions,
-  });}
-
-    // update Exam mock exam Result
-    exports.updateExamResult = (req, res) => {
-      let { loginUsername, examScore, IncorrectQList, userAttempt } = req.body;
-  
-      const currentUser = userAccount.find(user => user.name === loginUsername);
-      if (currentUser) {
-        // Update the Grade information by adding the examScore
-        currentUser.examGradesList[currentUser.examGradesList.length - 1] = examScore;
-        currentUser.examAttemptList.push(userAttempt)
-  
-        // Iterate over IncorrectQList and update inCorrectCount
-        IncorrectQList.forEach(qID => {
-          examBank.forEach(q => {
-            if (q.id === qID) {
-              q.inCorrectCount += 1;
-            }
-          });
-        });
-        
-        return res.status(201).json({
-          updateUserAccount:userAccount,
-          message: "Exam result updated successfully",
-        });
-      } else {
-        res.status(404).send("User not found");
-      }
-    };
-
-// delete user's grades
-exports.deleteUserGrades = (req, res) => {
-  const { userName } = req.body;
-  // select the account if user exists and response
-  selectedUser = userAccount.find(user => user.name === userName);
-  
-  // delete the users' grades
-  Object.assign(selectedUser, {
-    examGradesList:[],
-    examAttemptList:[]
-  });
-  res.status(200).json({
-    message: `${userName}'s grades has been deleted successfully.`,
-    updatedUserAccount: userAccount,
-  });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 
-// view User Detail Result
-exports.viewUserDetailResult = (req, res) => {
-  const { userName } = req.body;
 
+// send questions if start to exam (prepare the questions for the exam)
+exports.getExamPaperQuestion = async (req, res) => {
+    let { username } = req.body;
+  try {
+    // Find the user
+    const loginUser = await UserAccount.findOne({ name: username });
+    if (!loginUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Push 0 to user's exam grades list
+    loginUser.examGradesList.push(0);
+    await loginUser.save();
+
+    // Fetch exam questions and settings
+    const examBank = await ExamBank.find(); // Get all questions
+    const examModes = await ExamModes.findOne(); // Get exam settings
+
+    if (!examModes) {
+      return res.status(404).json({ message: "Exam settings not found" });
+    }
+
+    // Shuffle and filter questions
+    const singleChoiceBank = _.shuffle(examBank.filter(q => q.type === "Single Choice"));
+    const multipleChoiceBank = _.shuffle(examBank.filter(q => q.type === "Multiple Choice"));
+    const fillingBlankBank = _.shuffle(examBank.filter(q => q.type === "Filling Blank"));
+    const judgementsBank = _.shuffle(examBank.filter(q => q.type === "Judgements"));
+
+    // Select questions based on exam settings
+    const selectedQuestions = [
+      ...(examModes.examSingleChoiceCount > 0 ? singleChoiceBank.slice(0, examModes.examSingleChoiceCount) : []),
+      ...(examModes.examMultipleChoiceCount > 0 ? multipleChoiceBank.slice(0, examModes.examMultipleChoiceCount) : []),
+      ...(examModes.examFillingBlankCount > 0 ? fillingBlankBank.slice(0, examModes.examFillingBlankCount) : []),
+      ...(examModes.examJudgementsCount > 0 ? judgementsBank.slice(0, examModes.examJudgementsCount) : []),
+    ];
+
+    // Shuffle final selected questions
+    const shuffledQuestions = _.shuffle(selectedQuestions);
+
+    return res.status(200).json({
+      message: "The exam questions have been sent",
+      examPaperQuestions: shuffledQuestions,
+    });
+
+  } catch (error) {
+    console.error("Error fetching exam questions:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+
+
+
+// delete single user's grades
+exports.deleteUserGrades = async (req, res) => {
+  const { userName } = req.body;
+  try{
+  // select the account if user exists and response
+  const selectedUser = await UserAccount.findOne({ name: userName });
+
+  // delete the users' grades
+  selectedUser.examGradesList = [];
+  selectedUser.examAttemptList = [];
+  await selectedUser.save()
+
+  const updatedUserAccount = await UserAccount.find()
+
+  res.status(200).json({
+    message: `${userName}'s grades has been deleted successfully.`,
+    updatedUserAccount,
+  })} catch (error) {
+    console.error("Error delete grades:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+}};
+
+
+// view click User Detail Result (exam socre list view / student view)
+exports.viewUserDetailResult = async (req, res) => {
+  const { userName } = req.body;
+  try{
   // Calculate total score
-  const totalScore = (
+  const examModes = await ExamModes.findOne()
+  const totalScore =  (
     examModes.examSingleChoiceCount * examModes.examSingleChoiceScore +
     examModes.examMultipleChoiceCount * examModes.examMultipleChoiceScore +
     examModes.examFillingBlankCount * examModes.examFillingBlankScore +
     examModes.examJudgementsCount * examModes.examJudgementsScore
   );
 
-  // Find user
-  const selectedUser = userAccount.find(user => user.name === userName);
+  // Find select user
+  const selectedUser = await UserAccount.findOne({name : userName});
 
   if (!selectedUser || !selectedUser.examAttemptList.length || !selectedUser.examAttemptList.length) {
     return res.status(404).json({
@@ -554,32 +696,43 @@ exports.viewUserDetailResult = (req, res) => {
 
   // Get the first attempt
   let attempts = selectedUser.examAttemptList[0];
+  const qIDList = attempts.map(attempt => attempt.qID);
 
   // Find the corresponding questions
-  let examPaperQuestions = examBank.filter(question =>
-    attempts.some(attemptAnswer => attemptAnswer.qID === question.id)
-  );
+  let examPaperQuestions = await ExamBank.find({ id: { $in: qIDList } })
 
   // Calculate exam score
   let examScore = selectedUser.examGradesList[0]
 
   res.status(200).json({
-    examPaperQuestions: examPaperQuestions,
-    attempts: attempts,
-    totalScore: totalScore,
-    examScore: examScore,
+    examPaperQuestions,
+    attempts,
+    totalScore,
+    examScore,
     message: `${userName}'s grades have been posted successfully.`,
-  });
-};
+  })} catch (error) {
+    console.error("Error delete grades:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+}};
 
-// clear all grades and post new user account
-exports.deleteAllUserGrades = (req, res) => {
-  userAccount.forEach(user => {
-      user.examGradesList = [];
-      user.examAttemptList = [];
-  });
-  res.json({
-    message: "All users' grades have been cleered.",
-    updatedUserAccount: userAccount});
+
+// clear all grades and post new user account (exam socre list)
+exports.deleteAllUserGrades = async (req, res) => {
+  try {
+    // Update all users in the database
+    await UserAccount.updateMany({}, { 
+      examGradesList: [], 
+      examAttemptList: [] 
+    });
+    const updatedUserAccount = await UserAccount.find()
+    res.json({
+      message: "All users' grades have been cleared successfully.",
+      updatedUserAccount
+    });
+
+  } catch (error) {
+    console.error("Error clearing user grades:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 

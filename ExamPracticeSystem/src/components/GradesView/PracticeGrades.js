@@ -20,11 +20,11 @@ function PracticeGrades() {
   const { userAccount } = useContext(AppContext);
 
   // search items
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("Student");
   const filteredUsers = userAccount.filter(
     (user) =>
-      user.Loginrole === "Student"  &&                      // only display the students' grades
     ( user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.Loginrole.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastname.toLowerCase().includes(searchTerm.toLowerCase()))
   );

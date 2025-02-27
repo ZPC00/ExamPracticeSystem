@@ -123,7 +123,7 @@ function PracticeMockExam() {
   
 // the function to submit the exam
 const handleSubmitExam = () => {
-  if (submitted) return; // 防止重复提交
+  if (submitted) return; // avoid submit twice
     setSubmitted(true);
 
   // Ensure the current user's answer is stored if it's different
@@ -413,7 +413,7 @@ const handleSubmitExam = () => {
               handleNext();                                                              // Call next if not submitting
             }
             }} style={{ marginTop: "10px", marginLeft: "10px" }}>
-            {showSubmitBottun? "Submit" : "Next"}
+            {showSubmitBottun? "Submit" : "Save And Next"}
         </Button>
 
       </div>
