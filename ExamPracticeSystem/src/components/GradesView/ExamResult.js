@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableRow, Pagination } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import ClearIcon from "@mui/icons-material/Clear";
+import { Table, TableBody, TableCell, TableHead, TableRow, Pagination, IconButton, Dialog} from "@mui/material";
+import { Check as CheckIcon, Clear as ClearIcon, ImageOutlined as ImageOutlinedIcon} from '@mui/icons-material';
+
 
 function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPaperQuestions, attempts, examScore, totalScore }) {
   // Pagination
@@ -15,6 +15,9 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  // view detail of the image
+  const [viewImage, setViewImage] = useState(null)
   
   // Situation1: Display alert if the exam set Grades Visible is false
   if (!examStudentGradesVisible) {
@@ -71,7 +74,25 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
                 return (
                   <TableRow key={index} style={{ cursor: "pointer" }}>
                     <TableCell>{(page - 1) * itemsPerPage + index + 1}</TableCell>
-                    <TableCell>{question?.Question || ""}</TableCell>
+                    <TableCell>
+                      {question?.image && (
+                        <>
+                          <IconButton onClick={() => setViewImage(question.image)}>
+                            <ImageOutlinedIcon />
+                          </IconButton>
+                        </>
+                      )}{question?.Question}
+                    </TableCell>
+
+                    <Dialog open={Boolean(viewImage)} onClose={() => setViewImage(null)}>
+                      {viewImage && (
+                        <img 
+                          src={viewImage} 
+                          alt="Preview" 
+                          style={{ maxWidth: '700px', maxHeight: '500px' }} 
+                        />
+                      )}
+                    </Dialog>
                     <TableCell>{question?.type || ""}</TableCell>
                     <TableCell>
                       {["Single Choice", "Multiple Choice"].includes(question?.type)

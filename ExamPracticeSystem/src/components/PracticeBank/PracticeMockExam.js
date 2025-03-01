@@ -330,6 +330,11 @@ const handleSubmitExam = () => {
           {currentIndex + 1}. {currentQuestion.Question}
         </Typography>
 
+        {currentQuestion.image && (
+              <div style={{ marginTop: '10px', textAlign: "center" }}>
+                <img src={currentQuestion.image} alt="Preview" style={{ maxWidth: '400px', maxHeight: '250px' }} />
+              </div>)}
+
         {/* Single Choice*/}
         {currentQuestion.type === "Single Choice" && (
           <RadioGroup

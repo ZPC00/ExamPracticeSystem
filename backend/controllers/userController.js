@@ -169,7 +169,7 @@ exports.deletePracticeQuestion = async (req, res) => {
 
 // handle practice bank question maintenance (modify or add the questions)
 exports.savePracticeQusetion = async (req, res) => {
-  let { id, type, Question, A, B, C, D, E, correctAnswer,description } = req.body;
+  let { id, type, Question, A, B, C, D, E, correctAnswer,description,image } = req.body;
   try {
     if (id) {
         // Find question by ID
@@ -189,6 +189,8 @@ exports.savePracticeQusetion = async (req, res) => {
         selectedQuestion.E = E;
         selectedQuestion.correctAnswer = correctAnswer;
         selectedQuestion.description = description;
+        selectedQuestion.image = image;
+
 
         // Save updated questions
         await selectedQuestion.save();
@@ -221,6 +223,7 @@ exports.savePracticeQusetion = async (req, res) => {
       correctAnswer,
       description,
       inCorrectCount:0,
+      image,
     });
 
     // save to the dataset
@@ -361,7 +364,7 @@ exports.deleteExamQuestion = async (req, res) => {
 
 // Exam bank question maintenance (add/modify the questions)
 exports.saveExamQusetion = async (req, res) => {
-  let { id, type, Question, A, B, C, D, E, correctAnswer,description } = req.body;
+  let { id, type, Question, A, B, C, D, E, correctAnswer,description,image } = req.body;
   try {
     if (id) {
         // Find question by ID
@@ -381,6 +384,7 @@ exports.saveExamQusetion = async (req, res) => {
         selectedQuestion.E = E;
         selectedQuestion.correctAnswer = correctAnswer;
         selectedQuestion.description = description;
+        selectedQuestion.image = image;
 
         // Save updated questions
         await selectedQuestion.save();
@@ -413,6 +417,7 @@ exports.saveExamQusetion = async (req, res) => {
       correctAnswer,
       description,
       inCorrectCount:0,
+      image,
     });
 
     // save to the dataset
@@ -644,9 +649,6 @@ exports.getExamPaperQuestion = async (req, res) => {
     return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-
-
 
 
 // delete single user's grades

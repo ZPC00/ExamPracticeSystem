@@ -5,8 +5,8 @@ import { Explicit as ExplicitIcon, Home as HomeIcon, People as PeopleIcon, Setti
          ViewQuilt as ViewQuiltIcon, Grading as GradingIcon, PlaylistAddCheckCircle as PlaylistAddCheckCircleIcon,
          PlaylistAdd as PlaylistAddIcon, PermContactCalendar as PermContactCalendarIcon, PlaylistAddCircle as PlaylistAddCircleIcon
 } from '@mui/icons-material';
-
 import { AppContext } from './AppContext';
+import axios from 'axios';
 import DisplayAccountInfo from './AccountManagement/displayAccountInfo';
 import AccountMangement from './AccountManagement/accountMangement'
 import ManagePracticeBank from './PracticeBank/managePracticeBank'
@@ -72,7 +72,7 @@ export default function Navigator(props) {
   const { ...other } = props;
   
   // Context for user account and functs
-  const { username, userAccount, setfuncts,functs, examRuningState, setExamRuningState } = useContext(AppContext);
+  const { username, userAccount,setUserAccount, setfuncts,functs, examRuningState, setExamRuningState } = useContext(AppContext);
 
   // current user role
   const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
@@ -103,6 +103,14 @@ export default function Navigator(props) {
         return;
       }else{
         setExamRuningState(false)
+        axios.get('/userAccount')
+          .then(response => {
+            setUserAccount(response.data);
+            })
+          .catch(error => {
+              console.error('Error fetching product data:', error);
+            });
+
       }
     }
     if (functs===module){

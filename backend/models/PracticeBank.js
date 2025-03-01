@@ -11,7 +11,8 @@ const practiceBankSchema = new mongoose.Schema({
   E: String,
   correctAnswer: String,
   description: String,
-  inCorrectCount: Number
+  inCorrectCount: Number,
+  image:String
 });
 
 module.exports = mongoose.model("PracticeBank", practiceBankSchema);

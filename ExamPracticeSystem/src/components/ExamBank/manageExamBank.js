@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, 
-  Tooltip, Alert, TextField, Button, Dialog, DialogActions, DialogContent, 
-  DialogTitle, Autocomplete 
-} from '@mui/material';
-import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon, ReportProblem as ReportProblemIcon, AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, IconButton, Tooltip, Alert, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle, Autocomplete } from '@mui/material';
+import { UploadFile as UploadFileIcon, Edit as EditIcon, Delete as DeleteIcon, ReportProblem as ReportProblemIcon, AddCircleOutline as AddCircleOutlineIcon, ImageOutlined as ImageOutlinedIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -101,11 +97,35 @@ function ManageExamBank() {
     }
   };
 
+  
+
   // Handle question update initiation
   const handleUpdateQuestion = (question) => {
     setSelectedQuestion(question);
     setUpdatedInfo(question);
     setIsEditingOrAdd(true);
+  };
+
+  // handle upload Image
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setError("Image size should be smaller than 5MB.");
+        setTimeout(() => {
+          setError("");
+        }, 3000);
+        return;}
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUpdatedInfo((prevState) => ({
+          ...prevState,
+          image: reader.result, // Store the base64 string of the image in updatedInfo
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Function to save for adding or updating a question
@@ -288,7 +308,7 @@ function ManageExamBank() {
                   <TableRow key={row.id} style={{ cursor: 'pointer' }}>
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.type}</TableCell>
-                    <TableCell>{row.Question}</TableCell>
+                    <TableCell>{row.image&&(<ImageOutlinedIcon/>)} {row.Question}</TableCell>
                     <TableCell>{row.A}</TableCell>
                     <TableCell>{row.B}</TableCell>
                     <TableCell>{row.C}</TableCell>
@@ -518,6 +538,30 @@ function ManageExamBank() {
           style={{ marginTop: '20px' }}
           fullWidth
         />
+
+          {/* Image Upload Section */}
+          <div style={{ marginTop: '20px' }}>
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<UploadFileIcon />}
+            >
+              Upload Image
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImageUpload}
+              />
+            </Button>
+              
+            {updatedInfo.image && (
+              <div style={{ marginTop: '10px' }}>
+                <img src={updatedInfo.image} alt="Preview" style={{ maxWidth: '400px', maxHeight: '250px' }} />
+                <IconButton onClick={() => setUpdatedInfo((prevState) => ({ ...prevState, image: "" }))}> <DeleteIcon/> </IconButton>
+              </div>
+            )}
+          </div>
           
           {/* error allert to notice the users*/}
           {error && (

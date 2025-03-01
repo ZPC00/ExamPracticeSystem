@@ -7,8 +7,8 @@ const router = require('./routes/router.js');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: '10mb' }));  // Increase limit to 10 MB
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 //Use the Express framework to provide functionality for static files (images).
 app.use(express.static('images'));

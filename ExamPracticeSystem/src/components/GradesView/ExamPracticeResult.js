@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, Pagination } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, Pagination, IconButton, Dialog } from '@mui/material';
 import { AppContext } from '../AppContext';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
+import { Check as CheckIcon, Clear as ClearIcon, ImageOutlined as ImageOutlinedIcon} from '@mui/icons-material';
+
 
 function ExamPracticeResult({ attempts, PracticeScore }) {
   const { practiceBank } = useContext(AppContext);
@@ -19,6 +19,10 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  // view detail of the image
+  const [viewImage, setViewImage] = useState(null)
+  
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '880px' ,minWidth: '40%' }}>
@@ -65,7 +69,26 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
             return (
               <TableRow key={index} style={{ cursor: 'pointer' }}>
                 <TableCell>{(page - 1) * itemsPerPage + index + 1}</TableCell>
-                <TableCell>{question.Question || ""}</TableCell>
+                  <TableCell>
+                    {question?.image && (
+                      <>
+                        <IconButton onClick={() => setViewImage(question.image)}>
+                          <ImageOutlinedIcon />
+                        </IconButton>
+                      </>
+                    )}{question?.Question}
+                  </TableCell>
+                
+                  <Dialog open={Boolean(viewImage)} onClose={() => setViewImage(null)}>
+                    {viewImage && (
+                      <img 
+                        src={viewImage} 
+                          alt="Preview" 
+                          style={{ maxWidth: '700px', maxHeight: '500px' }} 
+                      />
+                    )}
+                 </Dialog>
+
                 <TableCell>{question.type || ""}</TableCell>
                 <TableCell>
                   {["Single Choice", "Multiple Choice"].includes(question.type)
