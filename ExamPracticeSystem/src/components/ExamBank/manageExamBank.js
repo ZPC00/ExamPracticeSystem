@@ -70,6 +70,9 @@ function ManageExamBank() {
     setPage(newPage);
   };
 
+  // view detail of the image
+  const [viewImage, setViewImage] = useState(null)
+
   // Handle deletion of a question with double click
   const handleDeleteQuestion = (id) => {
     if (!showConfirmation) {
@@ -96,8 +99,6 @@ function ManageExamBank() {
         });
     }
   };
-
-  
 
   // Handle question update initiation
   const handleUpdateQuestion = (question) => {
@@ -308,7 +309,25 @@ function ManageExamBank() {
                   <TableRow key={row.id} style={{ cursor: 'pointer' }}>
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.type}</TableCell>
-                    <TableCell>{row.image&&(<ImageOutlinedIcon/>)} {row.Question}</TableCell>
+                    <TableCell>
+                      {row.image && (
+                        <>
+                        <IconButton onClick={() => setViewImage(row.image)}>
+                          <ImageOutlinedIcon />
+                            </IconButton>
+                        </>
+                      )}{row.Question}
+                    </TableCell>
+                    
+                    <Dialog open={Boolean(viewImage)} onClose={() => setViewImage(null)}>
+                      {viewImage && (
+                        <img 
+                          src={viewImage} 
+                          alt="Preview" 
+                          style={{ maxWidth: '700px', maxHeight: '500px' }} 
+                        />
+                      )}
+                    </Dialog>
                     <TableCell>{row.A}</TableCell>
                     <TableCell>{row.B}</TableCell>
                     <TableCell>{row.C}</TableCell>

@@ -76,7 +76,7 @@ function ExamPracticeResult({ attempts, PracticeScore }) {
                           <ImageOutlinedIcon />
                         </IconButton>
                       </>
-                    )}{question?.Question}
+                    )}{question?.Question || "The question has been deleted !"}
                   </TableCell>
                 
                   <Dialog open={Boolean(viewImage)} onClose={() => setViewImage(null)}>

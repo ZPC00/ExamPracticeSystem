@@ -30,7 +30,6 @@ function ManagePracticeBank() {
   // confirmation module
   const [showConfirmation, setShowConfirmation] = useState("");
   
-
   // Filter questions based on search term
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -51,6 +50,9 @@ function ManagePracticeBank() {
   const [isEditingOrAdd, setIsEditingOrAdd] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState("");
   const [updatedInfo, setUpdatedInfo] = useState({});
+
+  // view detail of the image
+  const [viewImage, setViewImage] = useState(null)
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -273,6 +275,7 @@ function ManagePracticeBank() {
               onChange={(e) => {setPage(1);setSearchTerm(e.target.value)}}
               style={{ marginLeft: "auto" }}
           />
+          
           </div>
 
           {/* display questions table */}
@@ -299,7 +302,25 @@ function ManagePracticeBank() {
                   <TableRow key={row.id} style={{ cursor: 'pointer' }}>
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.type}</TableCell>
-                    <TableCell>{row.image&&(<ImageOutlinedIcon/>)} {row.Question}</TableCell>
+                    <TableCell>
+                      {row.image && (
+                        <>
+                        <IconButton onClick={() => setViewImage(row.image)}>
+                          <ImageOutlinedIcon />
+                            </IconButton>
+                        </>
+                        )}{row.Question}
+                    </TableCell>
+
+                    <Dialog open={Boolean(viewImage)} onClose={() => setViewImage(null)}>
+                      {viewImage && (
+                        <img 
+                          src={viewImage} 
+                          alt="Preview" 
+                          style={{ maxWidth: '700px', maxHeight: '500px' }} 
+                        />
+                       )}
+                    </Dialog>
                     <TableCell>{row.A}</TableCell>
                     <TableCell>{row.B}</TableCell>
                     <TableCell>{row.C}</TableCell>

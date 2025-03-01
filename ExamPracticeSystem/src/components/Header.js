@@ -2,12 +2,20 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { AppBar, Grid, IconButton, Link, Toolbar, Tooltip, Typography } from '@mui/material';
 import { Help as HelpIcon, Menu as MenuIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
+import { useContext } from 'react';
+import { AppContext } from './AppContext';
 import Account from './AccountManagement/Account';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 function Header(props) {
   const { onDrawerToggle } = props;
+
+  // Context for user account and functs
+  const { username, userAccount } = useContext(AppContext);
+
+  // current user role
+  const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
 
   return (
     <React.Fragment>
@@ -30,8 +38,9 @@ function Header(props) {
           {/* Documentation link */}
           <Grid item xs />
             <Grid item>
+            {currentUserRole==="Teacher"&&(
               <Link
-                href="/"
+                href="http://localhost:3030/files/QuestionUploadTemplate.xlsx"
                 variant="body2"
                 sx={{
                   textDecoration: 'none',
@@ -43,8 +52,8 @@ function Header(props) {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Go to docs
-              </Link>
+                Questions Upload Template
+              </Link>)}
             </Grid>
 
           {/* Notifications icon */}

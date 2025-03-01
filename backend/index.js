@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 //Use the Express framework to provide functionality for static files (images).
 app.use(express.static('images'));
 app.use('/images', express.static('images'))
+app.use('/files', express.static('files'))
 
 const corsOptions = {
     origin: '*',
