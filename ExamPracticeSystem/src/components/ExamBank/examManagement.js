@@ -53,11 +53,13 @@ function ExamManagement() {
   const handleSave = () => {
     if (dayjs(examModes.examEndTime).isBefore(dayjs(examModes.examStartTime))) {
       setError("End time must be after start time!");
+      setTimeout(() => {setError("");}, 3000);
       return;
     }
     // no quetion send the error message.
-    if (examModes.examSingleCount === 0 && examModes.examMultipleCount === 0 && examModes.examFillingCount === 0 && examModes.examJudgementsCount === 0){
-      setError("At least one questions is required!");
+    if (totalScore === 0){
+      setError("At least 1 questions is required and the total score should not be 0 !");
+      setTimeout(() => {setError("");}, 3000);
       return;
     }
     // send to back end to update.
@@ -156,7 +158,8 @@ function ExamManagement() {
           onChange={(e) =>{
             const newValue= Number(e.target.value)
             if (newValue>=0&&newValue<=examSingleChoiceBankLengh){
-            setExamModes({...examModes,examSingleChoiceCount:newValue});setAlarm("These modifications are not saved!")}}}
+            setExamModes({...examModes,examSingleChoiceCount:newValue});setAlarm("These modifications are not saved!")}
+          }}
           inputProps={{ min: 0 }}
           sx={{ width: "250px" }}
         />

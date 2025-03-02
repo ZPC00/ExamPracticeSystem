@@ -4,6 +4,7 @@ import {
   Autocomplete, Stack, Alert, Avatar, Tooltip
 } from '@mui/material';
 import { AppContext } from '../AppContext';
+import axios from 'axios';
 import ForgetPassword from './forgetPassword'
 import HomePage from '../HomePage';
 
@@ -29,7 +30,7 @@ const style = {
 
 function Account() {
   // Context for user account 
-  const { userAccount, username, setUsername, setfuncts } = useContext(AppContext);
+  const { username, setUsername, setfuncts } = useContext(AppContext);
  // the state of the modules
   const [open, setOpen] = useState(false);
   //set for log in
@@ -82,27 +83,33 @@ function Account() {
 
 
   //handle log in and storage the login in information to local storage.
-  const handleLogin = (userName, password, selectedUserRole) => {
-    const matchedUser = userAccount.find(user => user.name === userName && user.password === password && user.Loginrole === selectedUserRole);
-    if (matchedUser) {
-      setError('');
-      setLoginrole(selectedUserRole);
-      setUsername(userName);
-      setLoginid(matchedUser.id);
-      localStorage.setItem('username', userName);
-      localStorage.setItem('loginrole', selectedUserRole);
-      localStorage.setItem('loginid', matchedUser.id);
-      setShowSuccessAlert('Log in success.')
+  const handleLogin = async (userName, password, selectedUserRole) => {
+  try {
+    await axios
+    .post("/login", { userName,password,selectedUserRole })
+    .then((response) => {
+      localStorage.setItem("username", response.data.user.username);
+      localStorage.setItem("loginrole", response.data.user.role);
+      localStorage.setItem("loginid", response.data.user.id);
+
+      setLoginrole(response.data.user.role);
+      setUsername(response.data.user.username);
+      setLoginid(response.data.user.id);
+
+      setShowSuccessAlert(response.data.message);
       setTimeout(() => {
         handleClose();
       }, 1000);
-    } else {
-      setError('Username, password, role is invalid !');
-      setTimeout(() => {
-        setError('');
-      }, 3000);
-    }
-  };
+    })
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError("Server error");
+        }
+    setTimeout(() => setError(""), 3000);
+  }
+};
 
 
   //handle logou and remove from the local storage. we need to double click the buttun to log out

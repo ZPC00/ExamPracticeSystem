@@ -86,36 +86,34 @@ function ForgetPassword() {
       setTimeout(() => setError(""), 3000);
       return;
     }
-  
-    if (forgetPassword1 !== forgetPassword2) {
-      setError("Two new passwords do not match.");
+    if (!(forgetPassword1&&forgetPassword2)) {
+      setError("Both passwords are required!");
       setTimeout(() => setError(""), 3000);
       return;
     }
-  
-    if (!matchUserId) {
-      setError("User ID not found.");
-      return;
-    }
-  
-    const passwordData = {
+
+  const passwordData = {
       id: matchUserId,
       newPassword1: forgetPassword1,
       newPassword2: forgetPassword2,
     };
     
-    try {
-      const response = await axios.post("/updatePassword", passwordData);
-      setUserAccount(response.data.updatedUserAccount);
-      setSuccessMessage("Password reset successful!");
-      setTimeout(() => {
-        setSuccessMessage("");
-        handleClose();
-      }, 3000);
-    } catch (error) {
+  try {
+    const response = await axios.post("/updatePassword", passwordData);
+    setUserAccount(response.data.updatedUserAccount);
+    setSuccessMessage("Password reset successful!");
+    setTimeout(() => {
+      setSuccessMessage("");
+      handleClose();
+    }, 3000);
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      setError(error.response.data.message);
+    } else {
       console.error("Error resetting password:", error);
-      setError("Password reset failed. Please try again.");
     }
+    setTimeout(() => setError(""), 3000);
+  }
   };
   
   
@@ -173,7 +171,7 @@ function ForgetPassword() {
           )}
           
           {/* error message or successful message */}
-          {error && <Typography color="error">{error}</Typography>}
+          {error && (<Alert variant="outlined" severity="error">{error}</Alert>)}
           {successMessage && (<Alert variant="outlined" severity="success">{successMessage}</Alert>)}
 
         </DialogContent>

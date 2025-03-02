@@ -34,52 +34,35 @@ function DisplayAccountInfo() {
       }, 3000);
       return;
     }
-    // Ensure new passwords match
-    if (updatePasswordInfo.newPassword1 !== updatePasswordInfo.newPassword2) {
-      setError("Two new passwords do not the same.");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-      return;
-    }
-    // Verify old password correctness
-    if (updatePasswordInfo.oldPassword !== currentUserInfo.password) {
-      setError("Old password is incorrect.");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-      return;
-    }
-    // Ensure the new password is different from the old one
-    if (updatePasswordInfo.oldPassword === updatePasswordInfo.newPassword1) {
-      setError("New password is the same as the old password");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-      return;
-    }
+
     // add user id to match
     const passwordData = {
-      id: currentUserInfo.id, // ad
+      id: currentUserInfo.id, // id
       oldPassword: updatePasswordInfo.oldPassword,
       newPassword1: updatePasswordInfo.newPassword1,
       newPassword2: updatePasswordInfo.newPassword2,
     };
 
-    await axios
+    try {
+      await axios
       .post("/updatePassword", passwordData )
       .then((response) => {
         setUserAccount(response.data.updatedUserAccount);
-        setOutSuccess(response.data.message);          
+        setOutSuccess(response.data.message);       
         setTimeout(() => {
           setOutSuccess("");
         }, 3000);
         setUpdatePassword(false);
         setUpdatePasswordInfo({});
       })
-      .catch((error) => {
-        console.error("Error adding user:", error);
-    });
+    } catch(error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        console.error("Change password error:", error);
+      }
+      setTimeout(() => setError(""), 3000);
+    }
   };
   
   // Function to sum user grades

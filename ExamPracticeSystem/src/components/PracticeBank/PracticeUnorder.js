@@ -1,6 +1,6 @@
 import React, { useState, useContext,useEffect } from "react";
 import { AppContext } from "../AppContext";
-import {Button, Checkbox, TextField, FormControlLabel, Radio, RadioGroup, Typography, Stack} from "@mui/material";
+import {Button, Checkbox, TextField, FormControlLabel, Radio, RadioGroup, Typography, Stack, Alert} from "@mui/material";
 import _ from "lodash"
 
 function PracticeUnorder() {
@@ -21,6 +21,9 @@ function PracticeUnorder() {
   const [attempts, setAttempts] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentQuestion = practiceFilterBank[currentIndex];
+
+  // error notifications
+  const [error, setError] = useState("");
 
   // listen for currentIndex changes, randomize the order of options
   useEffect(() => {
@@ -86,14 +89,29 @@ function PracticeUnorder() {
   const handleSelectQuestionType = (filterType) => {
     const randomBank = _.shuffle(practiceBank);
     const filteredBank = filterType ? randomBank.filter(q => q.type === filterType) : randomBank;
-    setPracticeFilterBank(filteredBank);
-    setPracticeHomepage(false);
+    if(filteredBank.length!==0){
+      setPracticeFilterBank(filteredBank);
+      setPracticeHomepage(false); 
+    }
+      else{
+        setError("There is no questions in such type of the questions bank!")
+        setTimeout(() => {
+          setError("");
+        }, 3000);
+      }
   };
   
 
   return practiceHomepage ? (
     //  Homepage for filter the type of questions.
     <div>
+        {/* error allert to notice the users*/}
+          {error && (
+            <Alert variant="outlined" severity="error" style={{ textAlign: "center" }}>
+              {error}
+           </Alert>
+          )}
+
         <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to the Unordered Practice Quiz</h1>
         <h2 style={{ textAlign: "left", marginTop: "60px" }}>Please choose the question type you need to practice:</h2>
          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "200px", marginBottom: "150px", alignItems: "center" }}>

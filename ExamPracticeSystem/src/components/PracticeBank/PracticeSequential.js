@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AppContext } from "../AppContext";
-import {Button, Checkbox, TextField, FormControlLabel, Radio, RadioGroup, Typography, Stack} from "@mui/material";
+import {Button, Checkbox, TextField, FormControlLabel, Radio, RadioGroup, Typography, Stack, Alert} from "@mui/material";
 
 function PracticeSequential() {
 
@@ -19,6 +19,9 @@ function PracticeSequential() {
   const [attempts, setAttempts] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentQuestion = practiceFilterBank[currentIndex];
+
+  // error notifications
+  const [error, setError] = useState("");
 
   // the function for handle submit
   const handleSubmit = (QuestionType) => {
@@ -74,12 +77,25 @@ function PracticeSequential() {
     // the function to filter the type of questions
     const handleSelectQuestionType = (filterType) => {
       const filteredBank = filterType ? practiceBank.filter(q => q.type === filterType) : practiceBank;
+      if(filteredBank.length!==0){
       setPracticeFilterBank(filteredBank);
-      setPracticeHomepage(false);
+      setPracticeHomepage(false);}
+      else{
+        setError("There is no questions in such type of the questions bank!")
+        setTimeout(() => {
+          setError("");
+        }, 3000);
+      }
     };
 
   return practiceHomepage ? (
     <div>
+        {/* error allert to notice the users*/}
+          {error && (
+            <Alert variant="outlined" severity="error" style={{ textAlign: "center" }}>
+              {error}
+           </Alert>
+          )}
         <h1 style={{ color: "#1976D2", textAlign: "center", marginTop: "50px" }}>Welcome to the Sequential Practice Quiz</h1>
         <h2 style={{ textAlign: "left", marginTop: "60px" }}>Please choose the question type you need to practice:</h2>
          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "200px", marginBottom: "150px", alignItems: "center" }}>

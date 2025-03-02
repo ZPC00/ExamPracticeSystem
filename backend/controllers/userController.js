@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const bcrypt = require("bcrypt");
 const UserAccount = require("../models/UserAccount");
 const PracticeBank = require("../models/PracticeBank");
 const ExamBank = require("../models/ExamBank");
@@ -16,6 +17,45 @@ exports.getUserAccounts = async (req, res) => {
       res.status(500).json({ message: "server error" });
   }
 };
+
+
+// handle log in
+exports.login = async (req, res) => {
+  const { userName, password, selectedUserRole } = req.body;
+
+  try {
+    const loginUser = await UserAccount.findOne({ name: userName });
+
+    // check the user name
+    if (!loginUser) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    // check log in role
+    if (loginUser.Loginrole !== selectedUserRole) {
+      return res.status(401).json({ message: "Invalid Role" });
+    }
+
+    // check the password.
+    const checkPassword = await bcrypt.compare(password, loginUser.password);
+    if (!checkPassword) {
+      return res.status(401).json({ message: "Invalid Password" });
+    }
+
+    return res.status(200).json({
+      message: "User Login Successful",
+      user: {
+        id: loginUser.id,
+        username: loginUser.name,
+        role: loginUser.Loginrole
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 
 // handle delete user account
 exports.deleteUser = async (req, res) => {
@@ -55,6 +95,14 @@ exports.saveUser = async (req, res) => {
             return res.status(404).json({ error: `User with ID "${id}" not found.` });
         }
 
+      // encrypted password password if has changed
+        const isSamePassword = await bcrypt.compare(password, selectedUser.password);
+      
+        if (!isSamePassword) {
+          const salt = await bcrypt.genSalt(10);
+          password = await bcrypt.hash(password, salt);
+        }
+
         // Update user fields
         selectedUser.name = name;
         selectedUser.firstname = firstname;
@@ -80,6 +128,10 @@ exports.saveUser = async (req, res) => {
     if (lastUser && lastUser.id) {
       newId = (parseInt(lastUser.id, 10) + 1).toString().padStart(8, '0');
     }
+
+    // encrypted password
+    const salt = await bcrypt.genSalt(10);
+    password = await bcrypt.hash(password, salt);
 
     // pack new user data
     let newUser = new UserAccount({
@@ -114,11 +166,34 @@ exports.updatePassword = async (req, res) => {
     const selectedUser = await UserAccount.findOne({id:id});
     
     if (!selectedUser) {
-      return res.status(404).json({ error: `User with ID "${id}" not found.` });
+      return res.status(404).json({ message: `User with ID "${id}" not found.` });
     }
 
+    // Verify old password correctness for changing password
+    if(oldPassword){
+      const isCorrectnessOldPassword = await bcrypt.compare(oldPassword, selectedUser.password);
+      if (!isCorrectnessOldPassword) {
+        return res.status(401).json({ message: `Old password is incorrect.` });
+      }
+    }
+
+    // Verify old password if it is the same as old one
+    const isSamePassword = await bcrypt.compare(newPassword1, selectedUser.password);
+    if (isSamePassword) {
+      return res.status(401).json({ message: `New password is the same as the old password` });
+    }
+
+    // Verify two password whether they are the same.
+    if (newPassword1 !== newPassword2) {
+      return res.status(401).json({ message: `Two new passwords do not the same.` });
+    }
+
+    // encrypted password
+    const salt = await bcrypt.genSalt(10);
+    passwordHash = await bcrypt.hash(newPassword1, salt);
+
     // update the user's password
-    selectedUser.password = newPassword1;
+    selectedUser.password = passwordHash;
     await selectedUser.save();           // save to the dataset
     const updatedUserAccount = await UserAccount.find();
 
@@ -524,14 +599,38 @@ exports.getExamModes = async (req, res) => {
       }
     ]);
 
-    const examModes = await ExamModes.find();
-    const examSingleChoiceBankCount = examTypeCounts.find(item => item._id === "Single Choice").count
-    const examMultipleChoiceBankCount = examTypeCounts.find(item => item._id === "Multiple Choice").count
-    const examFillingBlankBankCount = examTypeCounts.find(item => item._id === "Filling Blank").count
-    const examJudgementsBankCount = examTypeCounts.find(item => item._id === "Judgements").count
+    let examMode = await ExamModes.findOne();
+    const examSingleChoiceBankCount = examTypeCounts.find(item => item._id === "Single Choice")?.count||0
+    const examMultipleChoiceBankCount = examTypeCounts.find(item => item._id === "Multiple Choice")?.count||0
+    const examFillingBlankBankCount = examTypeCounts.find(item => item._id === "Filling Blank")?.count||0
+    const examJudgementsBankCount = examTypeCounts.find(item => item._id === "Judgements")?.count||0
+
+    // handle the situations of the teacher delete the question bank and exam modes not updated.
+    if(examMode.examSingleChoiceCount>examSingleChoiceBankCount){
+      examMode.examSingleChoiceCount=examSingleChoiceBankCount
+      await examMode.save();
+    }
+    if(examMode.examMultipleChoiceCount>examMultipleChoiceBankCount){
+      examMode.examMultipleChoiceCount=examMultipleChoiceBankCount
+      await examMode.save();
+    }
+    if(examMode.examFillingBlankCount>examFillingBlankBankCount){
+      examMode.examFillingBlankCount=examFillingBlankBankCount
+      await examMode.save();
+    }
+    if(examMode.examJudgementsCount>examFillingBlankBankCount){
+      examMode.examJudgementsCount=examFillingBlankBankCount
+      await examMode.save();
+    }
+
+    // there can't bublic the exam if no questions in the exam modes setting.
+    if(examMode.examSingleChoiceCount+examMode.examMultipleChoiceCount+examMode.examJudgementsCount+examMode.examJudgementsCount===0){
+      examMode.examAvailable=false
+      await examMode.save();
+    }
 
     res.json({
-      examModesData: examModes[0],
+      examModesData: examMode,
       examSingleChoiceBankLengh: examSingleChoiceBankCount,
       examMultipleChoiceBankLengh: examMultipleChoiceBankCount,  
       examFillingBlankBankLengh: examFillingBlankBankCount,  

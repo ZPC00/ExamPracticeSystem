@@ -305,11 +305,9 @@ const handleSubmitExam = () => {
         {/* error allert to notice the users*/}
         { error && (
         <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", marginBottom: "20px" }}>
-        {error && (
           <Alert variant="outlined" severity="error" style={{ width: "270px", textAlign: "center" }}>
             {error}
           </Alert>
-        )}
       </div>
       )}
 
