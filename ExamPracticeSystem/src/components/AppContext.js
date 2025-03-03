@@ -21,11 +21,10 @@ export const AppProvider = ({ children }) => {
          .then(response => {
           if(response.data.matchUser){
               setCurrentUserInfor(response.data.matchUser);
-            }else{
-              setCurrentUserInfor({})
             }})
           .catch(error => {
               console.error('Error fetching product data:', error);
+              setCurrentUserInfor({})
             });
     }, [username]);
   
