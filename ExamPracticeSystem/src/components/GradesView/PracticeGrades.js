@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, TextField, TableSortLabel } from '@mui/material';
 import PropTypes from 'prop-types';
-import { AppContext } from '../AppContext';
+import axios from 'axios';
 
 function Title({ children }) {
   return (
@@ -16,8 +16,19 @@ Title.propTypes = {
 };
 
 function PracticeGrades() {
-  // Context for user account 
-  const { userAccount } = useContext(AppContext);
+    // get user list
+    const [userAccount, setUserAccount] = useState([]);
+  
+    //load the user account from back end service
+    useEffect(() => {
+      axios.get('/userAccount')
+          .then(response => {
+            setUserAccount(response.data);
+            })
+          .catch(error => {
+              console.error('Error fetching product data:', error);
+            });
+    }, []);
 
   // search items
   const [searchTerm, setSearchTerm] = useState("Student");

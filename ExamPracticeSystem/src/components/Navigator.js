@@ -72,10 +72,10 @@ export default function Navigator(props) {
   const { ...other } = props;
   
   // Context for user account and functs
-  const { username, userAccount,setUserAccount, setfuncts,functs, examRuningState, setExamRuningState } = useContext(AppContext);
+  const { username, setfuncts, functs, examRuningState, setExamRuningState, currentUserInfor, setCurrentUserInfor } = useContext(AppContext);
 
   // current user role
-  const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
+  const currentUserRole = currentUserInfor.Loginrole;
 
   // log in control by filtering display categories by currentUserRole
   const isCategoryVisible = (category) => {
@@ -103,14 +103,13 @@ export default function Navigator(props) {
         return;
       }else{
         setExamRuningState(false)
-        axios.get('/userAccount')
+        axios.post('/matchUserInfo',{username:username})
           .then(response => {
-            setUserAccount(response.data);
+            setCurrentUserInfor(response.data.matchUser);
             })
           .catch(error => {
               console.error('Error fetching product data:', error);
             });
-
       }
     }
     if (functs===module){

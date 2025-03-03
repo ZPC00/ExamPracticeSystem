@@ -8,7 +8,7 @@ import ExamPracticeResult from "../GradesView/ExamPracticeResult"
 
 function PracticeMockExam() {
 
-  const { practiceBank, setPracticeBank, setUserAccount,username,setfuncts } = useContext(AppContext);
+  const { practiceBank, setPracticeBank, username, setfuncts, setCurrentUserInfor } = useContext(AppContext);
 
   // filter different types of questions for the mock exam
   const singleChoiceBank = _.shuffle(practiceBank.filter(q => q.type === "Single Choice"))
@@ -16,10 +16,11 @@ function PracticeMockExam() {
   const fillingBlankBank = _.shuffle(practiceBank.filter(q => q.type === "Filling Blank"))
   const judgementsBank = _.shuffle(practiceBank.filter(q => q.type === "Judgements"))
 
+
   // state for change homepage
   const [practiceHomepage, setPracticeHomepage] = useState(true);
   const [randomOptions, setRandomOptions] = useState([]);
-  
+
 
   // state for filter question bank
   const [practiceFilterBank, setPracticeFilterBank] = useState([]);
@@ -30,6 +31,7 @@ function PracticeMockExam() {
   const [practiceTime, setPracticeTime] = useState(1);
   const [submitted, setSubmitted] = useState(false);               // set for the prevent not to submit twice
 
+  
   // state for the process of quiz
   const [userAnswer, setUserAnswer] = useState("");
   const [showSubmitBottun, setShowSubmitBottun] = useState(false);
@@ -39,6 +41,7 @@ function PracticeMockExam() {
 
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(practiceTime * 60); // Timer in seconds
+
 
   useEffect(() => {
     setTimer(practiceTime * 60); // Update timer based on practiceTime (in minutes)
@@ -52,6 +55,7 @@ function PracticeMockExam() {
         setRandomOptions(randomOptionList);
       }                          
   }, [currentIndex, currentQuestion]); // listen for current index, current qustion changes
+
 
   // Timer logic
   useEffect(() => {
@@ -147,11 +151,10 @@ const handleSubmitExam = () => {
   axios
     .post("/updatePracticeResult", newExamResultInfo)
     .then((response) => {
-      setUserAccount(response.data.updatedUserAccount);
+      setCurrentUserInfor(response.data.updatedCurrentUser);
       setTimeout(() => {
         setPracticeBank(response.data.updatedPracticeQuestion);
       }, 0);
-      console.log(response.data.message);
       setfuncts(<ExamPracticeResult attempts={attempts} PracticeScore={PracticeScore}/>);
     })
     .catch((error) => {

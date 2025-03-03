@@ -1,6 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { AppContext } from '../AppContext';
 import { DownloadForOffline as DownloadForOfflineIcon, Receipt as ReceiptIcon, Delete as DeleteIcon, DeleteForever as DeleteForeverIcon} from '@mui/icons-material';
 import axios from 'axios';
 import ExamResult from "../GradesView/ExamResult"
@@ -24,8 +23,19 @@ Title.propTypes = {
 };
 
 function ExamGrades() {
-  // Context for user account 
-  const { userAccount,setUserAccount } = useContext(AppContext);
+  // get user list
+  const [userAccount, setUserAccount] = useState([]);
+  
+  //load the user account from back end service
+  useEffect(() => {
+    axios.get('/userAccount')
+        .then(response => {
+          setUserAccount(response.data);
+          })
+        .catch(error => {
+            console.error('Error fetching product data:', error);
+          });
+  }, []);
 
   // search items
   const [searchTerm, setSearchTerm] = useState("Student");

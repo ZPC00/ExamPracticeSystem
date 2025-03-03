@@ -1,12 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Typography, TextField, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Alert } from "@mui/material";
 import PropTypes from "prop-types";
-import { AppContext } from "../AppContext";
 import axios from 'axios';
 
 function ForgetPassword() {
-  // Context for user account 
-  const { userAccount,setUserAccount } = useContext(AppContext);
+
   // State for open/close the dialog
   const [open, setOpen] = useState(false);
   
@@ -14,7 +12,7 @@ function ForgetPassword() {
   const [forgetPassword1, setForgetPassword1] = useState("");
   const [forgetPassword2, setForgetPassword2] = useState("");
   const [resetCode, setResetCode] = useState("");
-  const [matchUserId, setMatchUserId] = useState("");  
+  const [matchUser, setMatchUser] = useState({});  
 
   // State to store the randomly generated reset code
   const [randomNo, setRandomNo] = useState("");
@@ -42,42 +40,52 @@ function ForgetPassword() {
     setResetPasswordState(false);
   };
 
+
   // Function to validate user input and proceed to the reset step
   const handleContinue = async () => {
+    
     if (!forgetPassword1 || !forgetPassword2) {
-      setError("Both fields are required!");
-      setTimeout(() => setError(""), 3000);
-      return;
+        setError("Both fields are required!");
+        setTimeout(() => setError(""), 3000);
+        return;
     }
-  
-  // Check if the entered username and email match an existing user
-  const matchedUser = userAccount.find(
-      (user) => user.name === forgetPassword1 && user.email === forgetPassword2
-    );
 
-    if (matchedUser) {
+    try {
+        // Check the user name and get the user informations.
+        const response = await axios.post("/matchUserInfo", { username: forgetPassword1 });
+        const user = response.data.matchUser;
+        setMatchUser(user); 
 
-      // Store the user's ID for later password update
-      setMatchUserId(matchedUser.id)
+        // check the e-mail
+        if (user.email === forgetPassword2) {
+            // Clear input fields
+            setForgetPassword1("");
+            setForgetPassword2("");
 
-      // Clear input fields
-      setForgetPassword1("");
-      setForgetPassword2("");
+            // Move to the password reset step
+            setResetPasswordState(true);
 
-      // Move to the password reset step
-      setResetPasswordState(true);
-
-      // Generate a random 6-digit reset code which assume send to email
-      const randomNo = Math.floor(100000 + Math.random() * 900000);
-      setRandomNo(randomNo);
-      setTimeout(() => {
-        alert(`Assume Generated Reset Number: ${randomNo}`);
-      }, 500);
-    } else {
-      setError("User not found or email does not match.");
+    // Generate a random 6-digit reset code which assume send to email
+            const randomNo = Math.floor(100000 + Math.random() * 900000);
+            setRandomNo(randomNo);
+            setTimeout(() => {
+                alert(`Assume Generated Reset Number: ${randomNo}`);
+            }, 500);
+        } else {
+            // e-mail is not match
+            setError("User found, but email does not match.");
+            setTimeout(() => setError(""), 3000);
+        }
+    } catch (error) {
+      // user not found or other issues.
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        console.error("reset password error:", error);
+      }
       setTimeout(() => setError(""), 3000);
     }
-  };
+};
 
   // Function to handle password reset process
   const handleReset = async () => {
@@ -93,19 +101,19 @@ function ForgetPassword() {
     }
 
   const passwordData = {
-      id: matchUserId,
+      id: matchUser.id,
       newPassword1: forgetPassword1,
       newPassword2: forgetPassword2,
     };
     
   try {
     const response = await axios.post("/updatePassword", passwordData);
-    setUserAccount(response.data.updatedUserAccount);
+    if(response.status===200){
     setSuccessMessage("Password reset successful!");
     setTimeout(() => {
       setSuccessMessage("");
       handleClose();
-    }, 3000);
+    }, 3000);}
   } catch (error) {
     if (error.response && error.response.data && error.response.data.message) {
       setError(error.response.data.message);
@@ -114,7 +122,7 @@ function ForgetPassword() {
     }
     setTimeout(() => setError(""), 3000);
   }
-  };
+};
   
   
   return (

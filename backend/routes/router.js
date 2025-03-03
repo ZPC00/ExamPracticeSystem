@@ -8,6 +8,7 @@ router.post('/login', userController.login);
 router.post('/deleteUser', userController.deleteUser);
 router.post('/saveUser', userController.saveUser);
 router.post('/updatePassword', userController.updatePassword);
+router.post('/matchUserInfo', userController.matchUserInfo);
 
 
 router.get('/getPracticeBank', userController.getPracticeBank);

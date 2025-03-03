@@ -1,10 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography, Pagination, Tooltip, 
   Alert, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle, Autocomplete
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
-import { AppContext } from '../AppContext';
 import axios from 'axios';
 
 
@@ -22,8 +21,21 @@ Title.propTypes = {
 };
 
 function AccountMangement() {
-  // Context for user account management
-  const { userAccount, setUserAccount } = useContext(AppContext);
+
+  // get user list
+  const [userAccount, setUserAccount] = useState([]);
+  
+  //load the user account from back end service
+  useEffect(() => {
+    axios.get('/userAccount')
+        .then(response => {
+          setUserAccount(response.data);
+          })
+        .catch(error => {
+            console.error('Error fetching product data:', error);
+          });
+  }, []);
+
   // Success or error message
   const [error, setError] = useState("");
   const [outSuccess, setOutSuccess] = useState(null);

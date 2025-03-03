@@ -12,10 +12,8 @@ function Header(props) {
   const { onDrawerToggle } = props;
 
   // Context for user account and functs
-  const { username, userAccount } = useContext(AppContext);
+  const { currentUserInfor } = useContext(AppContext);
 
-  // current user role
-  const currentUserRole = userAccount.find(user => user.name === username)?.Loginrole;
 
   return (
     <React.Fragment>
@@ -38,7 +36,7 @@ function Header(props) {
           {/* Documentation link */}
           <Grid item xs />
             <Grid item>
-            {currentUserRole==="Teacher"&&(
+            {currentUserInfor.Loginrole==="Teacher"&&(
               <Link
                 href="http://localhost:3030/files/QuestionUploadTemplate.xlsx"
                 variant="body2"

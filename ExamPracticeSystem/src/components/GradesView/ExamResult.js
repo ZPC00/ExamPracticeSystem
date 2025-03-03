@@ -11,6 +11,7 @@ function ExamResult({ examStudentGradesVisible, examStudentAnswerVisible, examPa
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedRows = attempts.slice(startIndex, endIndex);
+  
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

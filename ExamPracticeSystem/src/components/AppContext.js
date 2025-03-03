@@ -5,23 +5,30 @@ import HomePage from './HomePage';
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    const [username, setUsername] = useState('');                       //log in current user
-    const [userAccount, setUserAccount] = useState([]);                 // user list
-    const [practiceBank, setPracticeBank] = useState([]);               // practice bank
-    const [functs, setfuncts] = useState(<HomePage/>);                  // for changing display page
-    const [examRuningState, setExamRuningState] = useState(false);      // for exam
+    const [username, setUsername] = useState('');                        // log in current user
+    const [currentUserInfor, setCurrentUserInfor] = useState({});       // user informations
 
-    //load the user account from back end service
+    const [practiceBank, setPracticeBank] = useState([]);              // practice bank
+    const [examRuningState, setExamRuningState] = useState(false);    // for exam jump out
+
+    const [functs, setfuncts] = useState(<HomePage/>);               // for changing display page
+
+
+
+    //load the current user information from back end service
     useEffect(() => {
-      axios.get('/userAccount')
-          .then(response => {
-            setUserAccount(response.data);
-            })
+      axios.post('/matchUserInfo',{username:username})
+         .then(response => {
+          if(response.data.matchUser){
+              setCurrentUserInfor(response.data.matchUser);
+            }else{
+              setCurrentUserInfor({})
+            }})
           .catch(error => {
               console.error('Error fetching product data:', error);
             });
-    }, []);
-
+    }, [username]);
+  
     //load the practice question from back end service
     useEffect(() => {
       axios.get('/getPracticeBank')
@@ -34,7 +41,7 @@ export const AppProvider = ({ children }) => {
         }, []);
 
     return (
-        <AppContext.Provider value={{ userAccount, setUserAccount, username, setUsername, functs, setfuncts, practiceBank, setPracticeBank, examRuningState, setExamRuningState }}>
+        <AppContext.Provider value={{ username, setUsername, functs, setfuncts, practiceBank, setPracticeBank, examRuningState, setExamRuningState, currentUserInfor, setCurrentUserInfor }}>
             {children}
         </AppContext.Provider>
     );

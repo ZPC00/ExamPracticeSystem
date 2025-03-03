@@ -8,10 +8,7 @@ import axios from 'axios';
 
 function DisplayAccountInfo() {
   // Context for user account management
-  const { username, userAccount, setUserAccount } = useContext(AppContext);
-  
-  // Find current user information based on username
-  const currentUserInfo = userAccount.find(user => user.name === username);
+  const { currentUserInfor, setCurrentUserInfor } = useContext(AppContext);
 
   // State for updating password
   const [updatePassword, setUpdatePassword] = useState(false);
@@ -24,7 +21,7 @@ function DisplayAccountInfo() {
   // Function to handle saving updated password
   const handleSaveChanges = async () => {
     // Set user ID in updatePasswordInfo
-    setUpdatePasswordInfo(prev => ({ ...prev, id: currentUserInfo.id }));
+    setUpdatePasswordInfo(prev => ({ ...prev, id: currentUserInfor.id }));
 
     // Validate required fields
     if (!updatePasswordInfo.oldPassword || !updatePasswordInfo.newPassword1 || !updatePasswordInfo.newPassword2) {
@@ -37,7 +34,7 @@ function DisplayAccountInfo() {
 
     // add user id to match
     const passwordData = {
-      id: currentUserInfo.id, // id
+      id: currentUserInfor.id, // id
       oldPassword: updatePasswordInfo.oldPassword,
       newPassword1: updatePasswordInfo.newPassword1,
       newPassword2: updatePasswordInfo.newPassword2,
@@ -47,7 +44,7 @@ function DisplayAccountInfo() {
       await axios
       .post("/updatePassword", passwordData )
       .then((response) => {
-        setUserAccount(response.data.updatedUserAccount);
+        setCurrentUserInfor(response.data.updatedCurrentUser);
         setOutSuccess(response.data.message);       
         setTimeout(() => {
           setOutSuccess("");
@@ -73,7 +70,7 @@ function DisplayAccountInfo() {
   return (
     <React.Fragment>
       {/*user information modal*/}
-      {currentUserInfo && (
+      {currentUserInfor && (
         <div>
           {outSuccess && (
             <Alert variant="outlined" severity="success">
@@ -87,27 +84,27 @@ function DisplayAccountInfo() {
           </h1>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>User ID:</h4>
-            <Typography>{currentUserInfo.id}</Typography>
+            <Typography>{currentUserInfor.id}</Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Frist Name:</h4>
-            <Typography>{currentUserInfo.firstname}</Typography>
+            <Typography>{currentUserInfor.firstname}</Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Last Name:</h4>
-            <Typography>{currentUserInfo.lastname}</Typography>
+            <Typography>{currentUserInfor.lastname}</Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>E-mail:</h4>
-            <Typography>{currentUserInfo.email}</Typography>
+            <Typography>{currentUserInfor.email}</Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>User Account:</h4>
-            <Typography>{currentUserInfo.name}</Typography>
+            <Typography>{currentUserInfor.name}</Typography>
           </div>
 
           {/* Update Password module */}
@@ -123,27 +120,27 @@ function DisplayAccountInfo() {
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>User Role:</h4>
-            <Typography>{currentUserInfo.Loginrole}</Typography>
+            <Typography>{currentUserInfor.Loginrole}</Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Sum Scores:</h4>
             <Typography>
-              {Sum(currentUserInfo.practiceGradesList)}
+              {Sum(currentUserInfor.practiceGradesList)}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Counts:</h4>
             <Typography>
-              {currentUserInfo.practiceGradesList.length}
+              {currentUserInfor.practiceGradesList.length}
             </Typography>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h4 style={{ marginRight: '8px' }}>Practice Average Scores:</h4>
             <Typography>
-              {currentUserInfo.practiceGradesList.length? (Sum(currentUserInfo.practiceGradesList)/currentUserInfo.practiceGradesList.length).toFixed(2):0}
+              {currentUserInfor.practiceGradesList.length? (Sum(currentUserInfor.practiceGradesList)/currentUserInfor.practiceGradesList.length).toFixed(2):0}
             </Typography>
           </div>
           <br />
@@ -152,9 +149,9 @@ function DisplayAccountInfo() {
       <Dialog open={updatePassword} onClose={() => setUpdatePassword(false)}>
         <DialogTitle>{ "Update Password" }</DialogTitle>
         <DialogContent>
-          {currentUserInfo&&(<TextField
+          {currentUserInfor&&(<TextField
             label="User Name"
-            value={currentUserInfo.name || ''}
+            value={currentUserInfor.name || ''}
             style={{ marginTop: '20px' }}
             fullWidth
             InputProps={{ readOnly: true }}

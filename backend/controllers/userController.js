@@ -57,6 +57,36 @@ exports.login = async (req, res) => {
 };
 
 
+// handle search user infor
+exports.matchUserInfo = async (req, res) => {
+  const { id, username } = req.body;
+  let matchUser = null;
+
+  try {
+    if (id) {
+      matchUser = await UserAccount.findOne({ id: id });
+    }
+
+    if (!matchUser && username) {
+      matchUser = await UserAccount.findOne({ name: username });
+    }
+
+    if (!matchUser) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    return res.status(200).json({
+      message: "User Login Successful",
+      matchUser,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+
 // handle delete user account
 exports.deleteUser = async (req, res) => {
     const { userName } = req.body;
@@ -195,11 +225,11 @@ exports.updatePassword = async (req, res) => {
     // update the user's password
     selectedUser.password = passwordHash;
     await selectedUser.save();           // save to the dataset
-    const updatedUserAccount = await UserAccount.find();
+    const updatedCurrentUser =  await UserAccount.findOne({id:id});
 
     return res.status(200).json({
       message: `Password has been updated successfully.`,
-      updatedUserAccount,
+      updatedCurrentUser,
     });
 }catch (error) {
   return res.status(500).json({ error: `Internal Server Error: ${error.message}` })}};
@@ -383,13 +413,13 @@ exports.updatePracticeResult = async (req, res) => {
     );
 
     // Retrieve updated data
-    const updatedUserAccount = await UserAccount.find();
+    const updatedCurrentUser = await UserAccount.findOne({ name: loginUsername });
     const updatedPracticeQuestion = await PracticeBank.find();
 
     return res.status(201).json({
       message: "Practice result updated successfully",
       updatedPracticeQuestion,
-      updatedUserAccount,
+      updatedCurrentUser,
     });
   } catch (error) {
     console.error("Error updating practice result:", error);
@@ -572,10 +602,10 @@ try{
     { $inc: { inCorrectCount: 1 } }
   );
 
-  const updateUserAccount = await UserAccount.find()
+  const updatedCurrentUser = await UserAccount.findOne({ name: loginUsername });
 
     return res.status(201).json({
-      updateUserAccount,
+      updatedCurrentUser,
       message: "Exam result updated successfully",
     });
   } else {

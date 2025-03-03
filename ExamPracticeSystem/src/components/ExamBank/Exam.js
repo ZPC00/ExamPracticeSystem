@@ -8,7 +8,7 @@ import ExamResult from "../GradesView/ExamResult"
 
 function Exam() {
 
-  const { userAccount,username,setfuncts,examRuningState, setExamRuningState,setUserAccount} = useContext(AppContext);
+  const { username,setfuncts,examRuningState, setExamRuningState, currentUserInfor, setCurrentUserInfor} = useContext(AppContext);
 
   // state for change homepage
   const [randomOptions, setRandomOptions] = useState([]);
@@ -32,7 +32,6 @@ function Exam() {
   const [openUserResult,setOpenUserResult]= useState(false);
   
   // set for the home page of the exam page and view the Exam Description
-  const currentUser = userAccount.find(user => user.name === username);
   const totalScore = (examModes.examSingleChoiceCount*examModes.examSingleChoiceScore+                // caculate total score
     examModes.examMultipleChoiceCount*examModes.examMultipleChoiceScore+examModes.examFillingBlankCount*examModes.examFillingBlankScore+examModes.examJudgementsCount*examModes.examJudgementsScore)
   
@@ -158,7 +157,7 @@ function Exam() {
 
   
 // the function to submit the exam
-const handleSubmitExam = () => {
+const handleSubmitExam = async () => {
   if (submitted) return; // check submitted to avoid submitting twice
     setSubmitted(true);
 
@@ -183,7 +182,8 @@ const handleSubmitExam = () => {
     .post("/updateExamResult", newExamResultInfo)
     .then((response) => {
       setExamRuningState(false);
-      setUserAccount(response.data.updateUserAccount);
+      console.log(response)
+      setCurrentUserInfor(response.data.updatedCurrentUser);
       setfuncts(<ExamResult examStudentGradesVisible={examModes.examStudentGradesVisible} examStudentAnswerVisible={examModes.examStudentAnswerVisible} 
         examPaperQuestions={examPaperQuestions} attempts={attempts} examScore={examScore} totalScore={totalScore}/>)
     })
@@ -231,7 +231,7 @@ const handleViewUserResult = (userName)=>{
 
   return examModes.examAvailable ?
   // check exam aviabiable?
-  (currentUser.examGradesList.length !== 0 ? (
+  (currentUserInfor.examGradesList.length !== 0 ? (
     
   // Situation 1： the user have taken the exam to display the grades
   <div>
@@ -269,7 +269,7 @@ const handleViewUserResult = (userName)=>{
     
     {/*submit button to view the detailed of the exam result*/}
     <Button underline style={{marginTop: "100px", marginBottom: "100px", color: "#1976D2", fontSize: "2rem",fontWeight: "bold",textDecoration: "underline"}} 
-    onClick={() => {if(currentUser.examAttemptList.length>0){handleViewUserResult(currentUser.name)}else{alert("There is no answers records, you may have suspended the exam during the process of the exam.")}}}>  {/*Check the users' answer list*/}
+    onClick={() => {if(currentUserInfor.examAttemptList.length>0){handleViewUserResult(currentUserInfor.name)}else{alert("There is no answers records, you may have suspended the exam during the process of the exam.")}}}>  {/*Check the users' answer list*/}
       You have taken the exam and the result has been submitted.
     </Button>
 
