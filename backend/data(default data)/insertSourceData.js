@@ -1,3 +1,4 @@
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoose = require("mongoose");
 const ExamBank = require("../models/ExamBank");
 const PracticeBank = require("../models/PracticeBank");
@@ -8,19 +9,31 @@ let practiceBank = require('./practiceBank');
 let examBank = require('./examBank');
 let examModes = require('./examModes');
 
-// 连接 MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/practiceExamSystem")
-  .then(() => console.log("connect db success!"))
-  .catch(err => console.error("connect db failed!", err));
+const uri = "mongodb+srv://czp:iRw9R434h940PUmN@exampracticesystem.ghmr3.mongodb.net/?retryWrites=true&w=majority&appName=ExamPracticeSystem";
 
-// 插入数据
+async function connectDB() {
+  try {
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB!");
+  } catch (err) {
+    console.error("Database connection failed:", err);
+  }
+}
+
+
 const InsertScourceData = async () => {
   try {
+    await connectDB();
+    // Clear existing data
     await ExamBank.deleteMany({});
     await PracticeBank.deleteMany({});
     await ExamModes.deleteMany({});
     await UserAccount.deleteMany({});
     
+    // Insert new data
     await ExamBank.insertMany(examBank);
     await PracticeBank.insertMany(practiceBank);
     await ExamModes.create(examModes);
