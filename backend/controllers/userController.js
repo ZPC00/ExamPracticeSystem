@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 const UserAccount = require("../models/UserAccount");
 const PracticeBank = require("../models/PracticeBank");
 const ExamBank = require("../models/ExamBank");
