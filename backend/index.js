@@ -30,9 +30,7 @@ app.use('/', router);
 const port = 3030;
 async function connectDB() {
   try {
-    await mongoose.connect(uri, {
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(uri);
     console.log("Connected to MongoDB!");
   } catch (err) {
     console.error("Database connection failed:", err);
