@@ -1,4 +1,3 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoose = require("mongoose");
 const ExamBank = require("../models/ExamBank");
 const PracticeBank = require("../models/PracticeBank");
