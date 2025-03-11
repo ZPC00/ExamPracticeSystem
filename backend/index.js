@@ -18,7 +18,7 @@ app.use('/images', express.static('images'))
 app.use('/files', express.static('files'))
 
 const corsOptions = {
-    origin: 'https://exampracticesystem-frontend.onrender.com/',
+    origin: 'https://exampracticesystem-backend.onrender.com',
     credentials: true,
     maxAge: 200
 };
