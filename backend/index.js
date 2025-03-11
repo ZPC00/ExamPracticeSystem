@@ -31,7 +31,6 @@ const port = 3030;
 async function connectDB() {
   try {
     await mongoose.connect(uri, {
-      useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     console.log("Connected to MongoDB!");
