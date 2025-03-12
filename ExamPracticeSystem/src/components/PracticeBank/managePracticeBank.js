@@ -75,7 +75,7 @@ function ManagePracticeBank() {
     } else {
       // delete and send backend to update
       axios
-        .post('/deletePracticeQuestion', { id })
+        .post('https://exampracticesystem-backend.onrender.com/deletePracticeQuestion', { id })
         .then((response) => {
           setPracticeBank(response.data.updatedPracticeQuestion);
           setOutSuccess(response.data.message);
@@ -142,7 +142,7 @@ function ManagePracticeBank() {
 
       // send backend to update
       axios
-        .post("/savePracticeQusetion", updatedInfo)
+        .post("https://exampracticesystem-backend.onrender.com/savePracticeQusetion", updatedInfo)
         .then((response) => {
           setPracticeBank(response.data.updatedPracticeQuestion);
           setOutSuccess(response.data.message);
@@ -161,7 +161,7 @@ function ManagePracticeBank() {
     else {
       // send backend to update
       axios
-        .post("/savePracticeQusetion", updatedInfo )
+        .post("https://exampracticesystem-backend.onrender.com/savePracticeQusetion", updatedInfo )
         .then((response) => {
           setPracticeBank(response.data.updatedPracticeQuestion);
           setOutSuccess(response.data.message);
@@ -212,7 +212,7 @@ function ManagePracticeBank() {
 
       // send to backend to update
       axios
-        .post("/excelPracticeUpdate", excelUpdateData)
+        .post("https://exampracticesystem-backend.onrender.com/excelPracticeUpdate", excelUpdateData)
         .then((response) => {
           setPracticeBank(response.data.updatedPracticeQuestion);
           alert(`${response.data.message} Please review the correctness of these questions!`);
