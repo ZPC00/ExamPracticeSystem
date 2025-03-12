@@ -17,7 +17,7 @@ export const AppProvider = ({ children }) => {
 
     //load the current user information from back end service
     useEffect(() => {
-      axios.post('/matchUserInfo',{username:username})
+      axios.post('https://exampracticesystem-backend.onrender.com/matchUserInfo',{username:username})
          .then(response => {
           if(response.data.matchUser){
               setCurrentUserInfor(response.data.matchUser);
@@ -30,7 +30,7 @@ export const AppProvider = ({ children }) => {
   
     //load the practice question from back end service
     useEffect(() => {
-      axios.get('/getPracticeBank')
+      axios.get('https://exampracticesystem-backend.onrender.com/getPracticeBank')
           .then(response => {
             setPracticeBank(response.data);
             })
