@@ -4,8 +4,6 @@ const mongoose = require("mongoose");
 const cors = require('cors');
 const uri = process.env.MONGODB_URI;
 
-
-
 const bodyParser = require('body-parser');
 const router = require('./routes/router.js');
 
@@ -52,6 +50,3 @@ const startServer = async () => {
 };
 
 startServer()
-
-
-
