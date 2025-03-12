@@ -71,7 +71,7 @@ function Exam() {
 
   // load the exam mode from back end
   useEffect(() => {
-    axios.get('/getExamModes')
+    axios.get('https://exampracticesystem-backend.onrender.com/getExamModes')
         .then(response => {
           setExamModes(response.data.examModesData);
           })
@@ -179,7 +179,7 @@ const handleSubmitExam = async () => {
 
   // Send the exam result to the back end.
   axios
-    .post("/updateExamResult", newExamResultInfo)
+    .post("https://exampracticesystem-backend.onrender.com/updateExamResult", newExamResultInfo)
     .then((response) => {
       setExamRuningState(false);
       console.log(response)
@@ -195,7 +195,7 @@ const handleSubmitExam = async () => {
   // the function to review the exam questions and start to exam
   const startExam = () => {
   if (window.confirm("The exam can't be suspended during the process, are you sure?")){
-  axios.post('/getExamPaperQuestion',{username})
+  axios.post('https://exampracticesystem-backend.onrender.com/getExamPaperQuestion',{username})
        .then(response => {
         setExamPaperQuestions(response.data.examPaperQuestions);
         const initializationAttempts = response.data.examPaperQuestions.map((question) => ({
@@ -216,7 +216,7 @@ const handleSubmitExam = async () => {
 // the function to view the detailed users' answers if the user have taken the exam.
 const handleViewUserResult = (userName)=>{
   axios
-    .post('/viewUserDetailResult', { userName })
+    .post('https://exampracticesystem-backend.onrender.com/viewUserDetailResult', { userName })
     .then((response) => {
       setExamPaperQuestions(response.data.examPaperQuestions)
       setAttempts(response.data.attempts)

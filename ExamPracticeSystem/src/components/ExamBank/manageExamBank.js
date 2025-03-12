@@ -30,7 +30,7 @@ function ManageExamBank() {
 
   //load the exam question from back end service
     useEffect(() => {
-      axios.get('/getExamBank')
+      axios.get('https://exampracticesystem-backend.onrender.com/getExamBank')
         .then(response => {
          setExamBank(response.data);
     })
@@ -83,7 +83,7 @@ function ManageExamBank() {
     } else {
       // delete and send backend to update
       axios
-        .post('/deleteExamQuestion', { id })
+        .post('https://exampracticesystem-backend.onrender.com/deleteExamQuestion', { id })
         .then((response) => {
           setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
@@ -151,7 +151,7 @@ function ManageExamBank() {
 
       // send backend to update
       axios
-        .post("/saveExamQusetion", updatedInfo)
+        .post("https://exampracticesystem-backend.onrender.com/saveExamQusetion", updatedInfo)
         .then((response) => {
           setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
@@ -170,7 +170,7 @@ function ManageExamBank() {
     else {
       // send backend to update
       axios
-        .post("/saveExamQusetion", updatedInfo )
+        .post("https://exampracticesystem-backend.onrender.com/saveExamQusetion", updatedInfo )
         .then((response) => {
           setExamBank(response.data.updatedExamQuestion);
           setOutSuccess(response.data.message);
@@ -221,7 +221,7 @@ function ManageExamBank() {
 
       // send to backend to update
       axios
-        .post("/excelExamUpdate", excelUpdateData)
+        .post("https://exampracticesystem-backend.onrender.com/excelExamUpdate", excelUpdateData)
         .then((response) => {
           setExamBank(response.data.updatedExamQuestion);
           alert(`${response.data.message} Please review the correctness of these questions!`);

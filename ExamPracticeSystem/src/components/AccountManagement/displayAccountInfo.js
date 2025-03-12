@@ -42,7 +42,7 @@ function DisplayAccountInfo() {
 
     try {
       await axios
-      .post("/updatePassword", passwordData )
+      .post("https://exampracticesystem-backend.onrender.com/updatePassword", passwordData )
       .then((response) => {
         setCurrentUserInfor(response.data.updatedCurrentUser);
         setOutSuccess(response.data.message);       

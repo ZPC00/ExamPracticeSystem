@@ -149,7 +149,7 @@ const handleSubmitExam = () => {
 
   // Send the exam result to the server
   axios
-    .post("/updatePracticeResult", newExamResultInfo)
+    .post("https://exampracticesystem-backend.onrender.com/updatePracticeResult", newExamResultInfo)
     .then((response) => {
       setCurrentUserInfor(response.data.updatedCurrentUser);
       setTimeout(() => {

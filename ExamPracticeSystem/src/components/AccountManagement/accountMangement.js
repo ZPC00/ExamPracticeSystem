@@ -27,7 +27,7 @@ function AccountMangement() {
   
   //load the user account from back end service
   useEffect(() => {
-    axios.get('/userAccount')
+    axios.get('https://exampracticesystem-backend.onrender.com/userAccount')
         .then(response => {
           setUserAccount(response.data);
           })
@@ -79,7 +79,7 @@ function AccountMangement() {
       }, 2000);
     } else {
       axios
-        .post("/deleteUser", { userName })
+        .post("https://exampracticesystem-backend.onrender.com/deleteUser", { userName })
         .then((response) => {
           setUserAccount(response.data.updatedUserAccount);
           setOutSuccess(response.data.message);
@@ -133,7 +133,7 @@ function AccountMangement() {
     if (updatedInfo.id) {
       // update user which have id
       axios
-        .post("/saveUser", updatedInfo)
+        .post("https://exampracticesystem-backend.onrender.com/saveUser", updatedInfo)
         .then((response) => {
           console.log(response)
           setUserAccount(response.data.updatedUserAccount);
@@ -151,7 +151,7 @@ function AccountMangement() {
     } else {
       // add user which means no id
       axios
-        .post("/saveUser", updatedInfo )
+        .post("https://exampracticesystem-backend.onrender.com/saveUser", updatedInfo )
         .then((response) => {
           console.log(response)
           setUserAccount(response.data.updatedUserAccount);

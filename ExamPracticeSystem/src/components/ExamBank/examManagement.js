@@ -23,7 +23,7 @@ function ExamManagement() {
 
   // the function to get the exam modes from the back end at beginning
   const fetchExamModes = () => {
-    axios.get('/getExamModes')
+    axios.get('https://exampracticesystem-backend.onrender.com/getExamModes')
       .then(response => {
         setExamModes(response.data.examModesData);
         setExamSingleChoiceBankLengh(response.data.examSingleChoiceBankLengh);
@@ -64,7 +64,7 @@ function ExamManagement() {
     }
     // send to back end to update.
     axios
-    .post("/updateExamMode", examModes)
+    .post("https://exampracticesystem-backend.onrender.com/updateExamMode", examModes)
     .then(response => {
       setSuccess(response.data.message);
       fetchExamModes()

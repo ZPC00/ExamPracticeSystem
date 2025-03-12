@@ -21,7 +21,7 @@ function PracticeGrades() {
   
     //load the user account from back end service
     useEffect(() => {
-      axios.get('/userAccount')
+      axios.get('https://exampracticesystem-backend.onrender.com/userAccount')
           .then(response => {
             setUserAccount(response.data);
             })

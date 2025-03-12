@@ -28,7 +28,7 @@ function ExamGrades() {
   
   //load the user account from back end service
   useEffect(() => {
-    axios.get('/userAccount')
+    axios.get('https://exampracticesystem-backend.onrender.com/userAccount')
         .then(response => {
           setUserAccount(response.data);
           })
@@ -116,7 +116,7 @@ function ExamGrades() {
       }, 2000);
     } else {
       axios
-        .post('/deleteUserGrades', { userName })
+        .post('https://exampracticesystem-backend.onrender.com/deleteUserGrades', { userName })
         .then((response) => {
           setUserAccount(response.data.updatedUserAccount);
           setOutSuccess(response.data.message);
@@ -133,7 +133,7 @@ function ExamGrades() {
   // the function to view the detailed users' answers
   const handleViewUserResult = (userName)=>{
       axios
-        .post('/viewUserDetailResult', { userName })
+        .post('https://exampracticesystem-backend.onrender.com/viewUserDetailResult', { userName })
         .then((response) => {
           setExamPaperQuestions(response.data.examPaperQuestions)
           setAttempts(response.data.attempts)
@@ -171,7 +171,7 @@ function ExamGrades() {
         return
       } else {
         axios
-          .get('/deleteAllUserGrades',)
+          .get('https://exampracticesystem-backend.onrender.com/deleteAllUserGrades',)
           .then((response) => {
             setUserAccount(response.data.updatedUserAccount);
             setOutSuccess(response.data.message);

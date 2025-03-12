@@ -103,7 +103,7 @@ export default function Navigator(props) {
         return;
       }else{
         setExamRuningState(false)
-        axios.post('/matchUserInfo',{username:username})
+        axios.post('https://exampracticesystem-backend.onrender.com/matchUserInfo',{username:username})
           .then(response => {
             setCurrentUserInfor(response.data.matchUser);
             })

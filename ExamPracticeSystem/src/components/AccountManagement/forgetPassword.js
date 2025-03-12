@@ -52,7 +52,7 @@ function ForgetPassword() {
 
     try {
         // Check the user name and get the user informations.
-        const response = await axios.post("/matchUserInfo", { username: forgetPassword1 });
+        const response = await axios.post("https://exampracticesystem-backend.onrender.com/matchUserInfo", { username: forgetPassword1 });
         const user = response.data.matchUser;
         setMatchUser(user); 
 
@@ -107,7 +107,7 @@ function ForgetPassword() {
     };
     
   try {
-    const response = await axios.post("/updatePassword", passwordData);
+    const response = await axios.post("https://exampracticesystem-backend.onrender.com/updatePassword", passwordData);
     if(response.status===200){
     setSuccessMessage("Password reset successful!");
     setTimeout(() => {
