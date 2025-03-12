@@ -1,3 +1,4 @@
+require('dotenv').config()
 const mongoose = require("mongoose");
 const ExamBank = require("../models/ExamBank");
 const PracticeBank = require("../models/PracticeBank");
@@ -8,14 +9,10 @@ let practiceBank = require('./practiceBank');
 let examBank = require('./examBank');
 let examModes = require('./examModes');
 
-const uri = "mongodb+srv://czp:iRw9R434h940PUmN@exampracticesystem.ghmr3.mongodb.net/?retryWrites=true&w=majority&appName=ExamPracticeSystem";
 
 async function connectDB() {
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("Connected to MongoDB!");
   } catch (err) {
     console.error("Database connection failed:", err);
