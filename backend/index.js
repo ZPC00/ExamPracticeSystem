@@ -1,8 +1,8 @@
+require('dotenv').config()
 const express = require('express');
 const mongoose = require("mongoose");
 const cors = require('cors');
-const uri = "mongodb+srv://czp:iRw9R434h940PUmN@exampracticesystem.ghmr3.mongodb.net/?retryWrites=true&w=majority&appName=ExamPracticeSystem";
-
+const uri = process.env.MONGODB_URI;
 
 const bodyParser = require('body-parser');
 const router = require('./routes/router.js');
@@ -18,7 +18,7 @@ app.use('/images', express.static('images'))
 app.use('/files', express.static('files'))
 
 const corsOptions = {
-    origin: 'https://exampracticesystem-backend.onrender.com',
+    origin: '*',
     credentials: true,
     maxAge: 200
 };
@@ -27,13 +27,10 @@ app.use(cors(corsOptions));
 app.use('/', router);
 
 //connect to server db
-const port = 3030;
+const port = process.env.PORT || 3030;
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI,{
-      keepAlive: true, 
-      keepAliveInitialDelay: 300000
-    });
+    await mongoose.connect(uri);
     console.log("Connected to MongoDB!");
   } catch (err) {
     console.error("Database connection failed:", err);
@@ -53,6 +50,3 @@ const startServer = async () => {
 };
 
 startServer()
-
-
-
