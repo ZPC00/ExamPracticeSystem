@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express');
 const mongoose = require("mongoose");
 const cors = require('cors');
-const uri = "mongodb+srv://czp:iRw9R434h940PUmN@exampracticesystem.ghmr3.mongodb.net/?retryWrites=true&w=majority&appName=ExamPracticeSystem";
+const uri = process.env.MONGODB_URI;
+
 
 
 const bodyParser = require('body-parser');
@@ -27,13 +29,10 @@ app.use(cors(corsOptions));
 app.use('/', router);
 
 //connect to server db
-const port = 3030;
+const port = process.env.PORT || 3030;
 async function connectDB() {
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(uri);
     console.log("Connected to MongoDB!");
   } catch (err) {
     console.error("Database connection failed:", err);
