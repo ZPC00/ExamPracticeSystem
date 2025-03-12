@@ -30,7 +30,7 @@ app.use('/', router);
 const port = 3030;
 async function connectDB() {
   try {
-    await mongoose.connect(uri,{
+    await mongoose.connect(process.env.MONGO_URI,{
       keepAlive: true, 
       keepAliveInitialDelay: 300000
     });
