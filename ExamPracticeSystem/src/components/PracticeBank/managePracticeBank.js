@@ -125,7 +125,8 @@ function ManagePracticeBank() {
   const handleSaveChanges = () => {
     // set the input fields based on question type
     if (
-      !( (updatedInfo.type==="Single Choice" && updatedInfo.A && updatedInfo.correctAnswer) || 
+      !   updatedInfo.Question && 
+      (  (updatedInfo.type==="Single Choice" && updatedInfo.A && updatedInfo.correctAnswer) || 
          (updatedInfo.type==="Multiple Choice" && updatedInfo.A && updatedInfo.B && updatedInfo.correctAnswer) ||
          (updatedInfo.type==="Filling Blank" && updatedInfo.correctAnswer) ||
          (updatedInfo.type==="Judgements" && (updatedInfo.correctAnswer === "True" || updatedInfo.correctAnswer === "False"))
@@ -383,7 +384,7 @@ function ManagePracticeBank() {
                                 problemReport = 'The correct answer must be "True" or "False"!';
                               }
                             }
-                            else if (!row.question) {
+                            if (!row.Question) {
                                  problemReport = 'Question title is required.';
                              }
                             return (
