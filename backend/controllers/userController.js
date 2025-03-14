@@ -715,9 +715,10 @@ exports.updateExamMode = async (req, res) => {
     examMode.examJudgementsCount = examJudgementsCount;
     examMode.examJudgementsScore = examJudgementsScore;
     examMode.examStudentGradesVisible = examStudentGradesVisible;
-    examMode.examStudentAnswerVisible = examStudentAnswerVisible;
     if(!examMode.examStudentGradesVisible){
       examMode.examStudentAnswerVisible = false
+    }else{
+      examMode.examStudentAnswerVisible = examStudentAnswerVisible;
     }
 
     await examMode.save();
