@@ -421,7 +421,7 @@ function ManageExamBank() {
 
       {/* Add or Edit Dialog */}
       <Dialog open={isEditingOrAdd} onClose={() => setIsEditingOrAdd(false)}>
-        <DialogTitle style={{ minWidth: '1000px' }}>{selectedQuestion ? "Edit Question" : "Add New Question"}</DialogTitle>
+        <DialogTitle style={{ minWidth: '500px' }}>{selectedQuestion ? "Edit Question" : "Add New Question"}</DialogTitle>
         <DialogContent>
 
           {/* only edit display and can't be modified for the id*/}
