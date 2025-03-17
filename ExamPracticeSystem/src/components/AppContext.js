@@ -12,6 +12,8 @@ export const AppProvider = ({ children }) => {
     const [examRuningState, setExamRuningState] = useState(false);    // for exam jump out
 
     const [functs, setfuncts] = useState(<HomePage/>);               // for changing display page
+    const [isloading, setIsloading] = useState(true);               // for changing display page
+
 
 
 
@@ -33,6 +35,7 @@ export const AppProvider = ({ children }) => {
       axios.get('https://exampracticesystem-backend.onrender.com/getPracticeBank')
           .then(response => {
             setPracticeBank(response.data);
+            setIsloading(false)
             })
           .catch(error => {
             console.error('Error fetching product data:', error);
@@ -40,7 +43,7 @@ export const AppProvider = ({ children }) => {
         }, []);
 
     return (
-        <AppContext.Provider value={{ username, setUsername, functs, setfuncts, practiceBank, setPracticeBank, examRuningState, setExamRuningState, currentUserInfor, setCurrentUserInfor }}>
+        <AppContext.Provider value={{ username, setUsername, functs, setfuncts, practiceBank, setPracticeBank, examRuningState, setExamRuningState, currentUserInfor, setCurrentUserInfor,isloading }}>
             {children}
         </AppContext.Provider>
     );

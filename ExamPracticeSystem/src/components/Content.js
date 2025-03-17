@@ -3,11 +3,17 @@ import AppBar from '@mui/material/AppBar';
 import Paper from '@mui/material/Paper';
 import { useContext } from 'react';
 import { AppContext } from './AppContext';
+import LinearProgress from '@mui/material/LinearProgress';
+
 
 
 export default function Content() {
   // import global variables for change display page
   const { functs} = useContext(AppContext);
+  const { isloading } = useContext(AppContext);
+  
+
+  
 
 
   return (
@@ -19,10 +25,17 @@ export default function Content() {
         sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
       >
       {/* change display page */}
-      <div style={{padding: '10px 20px'}}>
+      {isloading? (
+        <>
+        <LinearProgress/>
+      <h3>Due to the limitations of free users of the onrender platform, it will take more loading time on first visiting, please wait...</h3> 
+      </>
+      ) :  (
+        <div style={{padding: '10px 20px'}}>
         {functs}
       </div>
-
+      )
+    }
     </AppBar>
     </Paper>
   );
