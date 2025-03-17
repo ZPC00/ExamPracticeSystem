@@ -428,7 +428,7 @@ function ManagePracticeBank() {
             disablePortal
             options={['Single Choice', 'Filling Blank', 'Multiple Choice','Judgements']}
             value={updatedInfo.type || ''}
-            onChange={(event, newValue) => setUpdatedInfo({ ...updatedInfo, type: newValue })}
+            onChange={(event, newValue) => setUpdatedInfo({ type: newValue })}      // reset the filling content when change the type
             style={{ marginTop: '20px' }}
             fullWidth
             renderInput={(params) => <TextField {...params} label="Type" />}/>
