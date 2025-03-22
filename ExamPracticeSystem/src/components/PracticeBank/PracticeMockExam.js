@@ -130,11 +130,6 @@ const handleSubmitExam = () => {
   if (submitted) return; // avoid submit twice
     setSubmitted(true);
 
-  // Ensure the current user's answer is stored if it's different
-  if (attempts[currentIndex].userAnswer !== userAnswer) {
-    handleSubmitUserAnswer(currentQuestion.type);
-  }
-  console.log(attempts)
   // Calculate Practice Score and Incorrect Questions List
   const PracticeScore = attempts.filter((a) => a.correctness).length;
   const IncorrectQIDList = attempts.filter((a) => !a.correctness).map((a) => a.qID);
@@ -343,6 +338,7 @@ const handleSubmitExam = () => {
             onChange={(e) => {
 
                 setUserAnswer(e.target.value);
+                setShowSubmitBottun(false)
               }
             }
           >
@@ -372,6 +368,7 @@ const handleSubmitExam = () => {
                             setUserAnswer((prev) =>
                               e.target.checked ? prev + option : prev.replace(option, "")
                             );
+                            setShowSubmitBottun(false)
                           }
                         }
                       />
@@ -389,7 +386,10 @@ const handleSubmitExam = () => {
             variant="outlined"
             fullWidth
             value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
+            onChange={(e) => {
+              setUserAnswer(e.target.value);
+              setShowSubmitBottun(false)
+            }}
             margin="normal"
           />
         )}
@@ -401,6 +401,7 @@ const handleSubmitExam = () => {
             onChange={(e) => {
               // only handle no answered question
                 setUserAnswer(e.target.value);
+                setShowSubmitBottun(false)
               }
             }
           >

@@ -160,11 +160,6 @@ function Exam() {
 const handleSubmitExam = async () => {
   if (submitted) return; // check submitted to avoid submitting twice
     setSubmitted(true);
-
-  // Ensure the current user's answer is stored if it's different
-  if (attempts[currentIndex].userAnswer !== userAnswer) {
-    handleSubmitUserAnswer(currentQuestion.type);
-  }
   
   // Calculate Exam Score and Incorrect Questions List
   const examScore = attempts.reduce((total, a) => total + a.score, 0);
@@ -358,6 +353,7 @@ const handleViewUserResult = (userName)=>{
             value={userAnswer}
             onChange={(e) => {
                 setUserAnswer(e.target.value);
+                setShowSubmitBottun(false)
               }
             }
           >
@@ -386,6 +382,7 @@ const handleViewUserResult = (userName)=>{
                             setUserAnswer((prev) =>
                               e.target.checked ? prev + option : prev.replace(option, "")
                             );
+                            setShowSubmitBottun(false)
                           }
                         }
                       />
@@ -403,7 +400,10 @@ const handleViewUserResult = (userName)=>{
             variant="outlined"
             fullWidth
             value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
+            onChange={(e) => {
+              setUserAnswer(e.target.value);
+              setShowSubmitBottun(false)
+            }}
             margin="normal"
           />
         )}
@@ -415,6 +415,7 @@ const handleViewUserResult = (userName)=>{
             onChange={(e) => {
               // only handle no answered question
                 setUserAnswer(e.target.value);
+                setShowSubmitBottun(false)
               }
             }
           >
