@@ -402,7 +402,7 @@ function ManageExamBank() {
                                 </Tooltip>
                               )
                             );
-                          })}
+                          })()}
                       </div>
                     </TableCell>
                   </TableRow>
