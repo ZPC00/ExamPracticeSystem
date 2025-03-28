@@ -392,7 +392,7 @@ function ManageExamBank() {
                                 problemReport = 'The correct answer must be "True" or "False"!';
                               }
                             }
-                            if (!row.question) {
+                            if (!row.Question) {
                                  problemReport = 'Question title is required.';
                              }
                             return (
@@ -402,7 +402,7 @@ function ManageExamBank() {
                                 </Tooltip>
                               )
                             );
-                          })()}
+                          })}
                       </div>
                     </TableCell>
                   </TableRow>
