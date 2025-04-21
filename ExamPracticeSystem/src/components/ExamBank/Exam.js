@@ -107,7 +107,7 @@ function Exam() {
       handleCorrectAnswer = currentQuestion.correctAnswer.split("").sort().join("").toUpperCase();
     }
     
-    // define the correctness of users' answers
+    // define the correctness of users' answers and set its socres
     const correctness = handleUserAnswer === handleCorrectAnswer;
     let currentQuestionScore =0
     if (QuestionType === "Single Choice" && correctness){

@@ -44,7 +44,7 @@ function ForgetPassword() {
   // Function to validate user input and proceed to the reset step
   const handleContinue = async () => {
     
-    if (!forgetPassword1 || !forgetPassword2) {
+    if (!forgetPassword1 || !forgetPassword2) {    // user name and e-mail
         setError("Both fields are required!");
         setTimeout(() => setError(""), 3000);
         return;

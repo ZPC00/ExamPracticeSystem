@@ -12,7 +12,7 @@ export const AppProvider = ({ children }) => {
     const [examRuningState, setExamRuningState] = useState(false);    // for exam jump out
 
     const [functs, setfuncts] = useState(<HomePage/>);               // for changing display page
-    const [isloading, setIsloading] = useState(true);               // for changing display page
+    const [isloading, setIsloading] = useState(true);               // for the load state of the system
 
 
 

@@ -76,7 +76,7 @@ exports.matchUserInfo = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "User Login Successful",
+      message: "User match Successful",
       matchUser,
     });
   } catch (error) {
@@ -807,7 +807,7 @@ exports.deleteUserGrades = async (req, res) => {
 }};
 
 
-// view click User Detail Result (exam socre list view / student view)
+// view click User Detail Result (for exam socre list review/ student review)
 exports.viewUserDetailResult = async (req, res) => {
   const { userName } = req.body;
   try{
@@ -854,7 +854,7 @@ exports.viewUserDetailResult = async (req, res) => {
 // clear all grades and post new user account (exam socre list)
 exports.deleteAllUserGrades = async (req, res) => {
   try {
-    // Update all users in the database
+    // Update all users's grades in the database
     await UserAccount.updateMany({}, { 
       examGradesList: [], 
       examAttemptList: [] 

@@ -97,6 +97,7 @@ export default function Navigator(props) {
 
   // function to change the display module
   const handleModuleClick = async (module) => {
+    // check whether the exam is processing
     if (examRuningState) {
       const confirmExit = window.confirm("The exam is processing, changing the page will stop the exam and result in a score of 0. Are you sure?");
       if (!confirmExit) {
