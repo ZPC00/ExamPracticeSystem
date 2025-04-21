@@ -24,9 +24,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.get('/', (req, res) => {
-  res.send(' The practice exam system  backend server is running!');
-})
+app.use('/', router);
 
 //connect to server db
 const port = process.env.PORT || 3030;

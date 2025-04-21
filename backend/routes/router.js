@@ -34,4 +34,8 @@ router.post('/viewUserDetailResult', userController.viewUserDetailResult);
 
 router.get('/deleteAllUserGrades', userController.deleteAllUserGrades);
 
+router.get('/', (req, res) => {
+    res.send('The practice exam system backend server is running!');
+  });
+
 module.exports = router;
